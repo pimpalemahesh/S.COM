@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "534351877834",
+    "project_id": "socom-9656a",
+    "storage_bucket": "socom-9656a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:534351877834:android:8f7af3c534eeeb02270633",
+        "android_client_info": {
+          "package_name": "com.myinnovation.socom"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "534351877834-ichroa5qdd0p6dq6ia7uc3360brms14m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD2SR3hDcBP4pXOqw9Ddz_mcQduPbJLEAQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "534351877834-ichroa5qdd0p6dq6ia7uc3360brms14m.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
