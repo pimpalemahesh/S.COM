@@ -7,6 +7,7 @@
         <entry key="..\:/AndroidStudioProjects/__Complete Project__/SOCOM/app/src/main/res/drawable/circle.xml" value="0.290625" />
         <entry key="..\:/AndroidStudioProjects/__Complete Project__/SOCOM/app/src/main/res/drawable/follow_active_btn.xml" value="0.290625" />
         <entry key="..\:/AndroidStudioProjects/__Complete Project__/SOCOM/app/src/main/res/drawable/follow_btn.xml" value="0.290625" />
+        <entry key="..\:/AndroidStudioProjects/__Complete Project__/SOCOM/app/src/main/res/drawable/ic_baseline_send_24.xml" value="0.2703125" />
         <entry key="..\:/AndroidStudioProjects/__Complete Project__/SOCOM/app/src/main/res/drawable/ic_email.xml" value="0.290625" />
         <entry key="..\:/AndroidStudioProjects/__Complete Project__/SOCOM/app/src/main/res/drawable/ic_image.xml" value="0.290625" />
         <entry key="..\:/AndroidStudioProjects/__Complete Project__/SOCOM/app/src/main/res/drawable/ic_like.xml" value="0.290625" />
@@ -19,10 +20,11 @@
         <entry key="..\:/AndroidStudioProjects/__Complete Project__/SOCOM/app/src/main/res/drawable/right_round_bg.xml" value="0.290625" />
         <entry key="..\:/AndroidStudioProjects/__Complete Project__/SOCOM/app/src/main/res/drawable/toolbar_bg.xml" value="0.290625" />
         <entry key="..\:/AndroidStudioProjects/__Complete Project__/SOCOM/app/src/main/res/drawable/white_circle.xml" value="0.290625" />
-        <entry key="..\:/AndroidStudioProjects/__Complete Project__/SOCOM/app/src/main/res/layout/activity_comment.xml" value="0.2" />
+        <entry key="..\:/AndroidStudioProjects/__Complete Project__/SOCOM/app/src/main/res/layout/activity_comment.xml" value="0.16182572614107885" />
         <entry key="..\:/AndroidStudioProjects/__Complete Project__/SOCOM/app/src/main/res/layout/activity_login.xml" value="0.27447916666666666" />
         <entry key="..\:/AndroidStudioProjects/__Complete Project__/SOCOM/app/src/main/res/layout/activity_main.xml" value="0.27447916666666666" />
         <entry key="..\:/AndroidStudioProjects/__Complete Project__/SOCOM/app/src/main/res/layout/activity_sign_up.xml" value="0.27447916666666666" />
+        <entry key="..\:/AndroidStudioProjects/__Complete Project__/SOCOM/app/src/main/res/layout/comment_sample.xml" value="0.22282608695652173" />
         <entry key="..\:/AndroidStudioProjects/__Complete Project__/SOCOM/app/src/main/res/layout/dashboard_rv_sample.xml" value="0.176" />
         <entry key="..\:/AndroidStudioProjects/__Complete Project__/SOCOM/app/src/main/res/layout/follow_btn.xml" value="0.27447916666666666" />
         <entry key="..\:/AndroidStudioProjects/__Complete Project__/SOCOM/app/src/main/res/layout/followers_rv_sample.xml" value="0.25416666666666665" />

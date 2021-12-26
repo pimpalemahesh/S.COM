@@ -7,6 +7,7 @@ public class Post {
     private String postDescription;
     private long postAt;
     private int postLike;
+    private int commentCount;
 
     public Post() {
     }
@@ -17,6 +18,14 @@ public class Post {
         this.postBy = postBy;
         this.postDescription = postDescription;
         this.postAt = postAt;
+    }
+
+    public int getCommentCount() {
+        return commentCount;
+    }
+
+    public void setCommentCount(int commentCount) {
+        this.commentCount = commentCount;
     }
 
     public int getPostLike() {

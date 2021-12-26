@@ -1,6 +1,7 @@
 package com.myinnovation.socom.Adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.myinnovation.socom.Activity.CommentActivity;
 import com.myinnovation.socom.Model.Post;
 import com.myinnovation.socom.Model.UserClass;
 import com.myinnovation.socom.R;
@@ -52,6 +54,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.myviewholder> 
                 .into(holder.binding.postImage);
 
         holder.binding.like.setText(model.getPostLike() + "");
+        holder.binding.comment.setText(model.getCommentCount() + "");
         String description = model.getPostDescription();
         if(description.equals("")){
             holder.binding.postDescription.setVisibility(View.GONE);
@@ -100,31 +103,16 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.myviewholder> 
                         else{
                             // if user liked post then first create like node then set its value to true then create postLike node increase count
                             // and change drawable left to with new image.
-                            holder.binding.like.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    FirebaseDatabase.getInstance().getReference()
+                            holder.binding.like.setOnClickListener(view -> FirebaseDatabase.getInstance().getReference()
+                                    .child("posts")
+                                    .child(model.getPostId())
+                                    .child("likes")
+                                    .child(FirebaseAuth.getInstance().getUid())
+                                    .setValue(true).addOnSuccessListener(unused -> FirebaseDatabase.getInstance().getReference()
                                             .child("posts")
                                             .child(model.getPostId())
-                                            .child("likes")
-                                            .child(FirebaseAuth.getInstance().getUid())
-                                            .setValue(true).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void unused) {
-                                            FirebaseDatabase.getInstance().getReference()
-                                                    .child("posts")
-                                                    .child(model.getPostId())
-                                                    .child("postLike")
-                                                    .setValue(model.getPostLike() + 1).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void unused) {
-                                                    holder.binding.like.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_userliked, 0, 0, 0);
-                                                }
-                                            });
-                                        }
-                                    });
-                                }
-                            });
+                                            .child("postLike")
+                                            .setValue(model.getPostLike() + 1).addOnSuccessListener(unused1 -> holder.binding.like.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_userliked, 0, 0, 0))));
                         }
                     }
 
@@ -134,7 +122,13 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.myviewholder> 
                     }
                 });
 
-
+        holder.binding.comment.setOnClickListener(v -> {
+            Intent intent = new Intent(context, CommentActivity.class);
+            intent.putExtra("postId", model.getPostId());
+            intent.putExtra("postedBy", model.getPostBy());
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(intent);
+        });
     }
 
     @Override
