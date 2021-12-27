@@ -26,4 +26,5 @@
     <string name="already_have_an_accont">Already have an accont?</string>
     <string name="login">Sign In</string>
     <string name="follow">Follow</string>
+    <string name="add_people">Add People</string>
 </resources>

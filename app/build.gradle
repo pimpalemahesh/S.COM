@@ -8,7 +8,7 @@ android {
 
     defaultConfig {
         applicationId "com.myinnovation.socom"
-        minSdk 16
+        minSdk 21
         targetSdk 31
         versionCode 1
         versionName "1.0"
@@ -54,5 +54,12 @@ dependencies {
 
     implementation 'com.squareup.picasso:picasso:2.71828'
     implementation 'com.github.marlonlom:timeago:4.0.3'
+
+    // statusCircle view
+    implementation 'com.github.3llomi:CircularStatusView:V1.0.2'
+    // story view
+    implementation 'com.github.OMARIHAMZA:StoryView:1.0.2-alpha'
+    // shimmer effect
+    implementation 'com.github.sharish:ShimmerRecyclerView:v1.3'
 
 }

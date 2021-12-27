@@ -17,12 +17,12 @@ import com.google.firebase.database.ValueEventListener;
 import com.myinnovation.socom.Model.Comment;
 import com.myinnovation.socom.Model.UserClass;
 import com.myinnovation.socom.R;
-import com.myinnovation.socom.databinding.CommentSampleBinding;
+import com.myinnovation.socom.databinding.SampleCommentBinding;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
-public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.viewholder>{
+public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.viewholder> {
 
     Context context;
     ArrayList<Comment> list;
@@ -35,7 +35,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.viewhold
     @NonNull
     @Override
     public viewholder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new viewholder(LayoutInflater.from(context).inflate(R.layout.comment_sample, parent, false));
+        return new viewholder(LayoutInflater.from(context).inflate(R.layout.sample_comment, parent, false));
     }
 
     @Override
@@ -71,12 +71,13 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.viewhold
         return list.size();
     }
 
-    public class viewholder extends RecyclerView.ViewHolder{
+    public class viewholder extends RecyclerView.ViewHolder {
 
-        CommentSampleBinding binding;
+        SampleCommentBinding binding;
+
         public viewholder(@NonNull View itemView) {
             super(itemView);
-            binding = CommentSampleBinding.bind(itemView);
+            binding = SampleCommentBinding.bind(itemView);
         }
     }
 }

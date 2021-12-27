@@ -10,22 +10,22 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.myinnovation.socom.Model.FollowModel;
+import com.myinnovation.socom.Model.Follow;
+import com.myinnovation.socom.Model.Notification;
 import com.myinnovation.socom.Model.UserClass;
 import com.myinnovation.socom.R;
-import com.myinnovation.socom.databinding.UserSampleBinding;
+import com.myinnovation.socom.databinding.SampleUserBinding;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Date;
 
-public class UserAdapter extends RecyclerView.Adapter<UserAdapter.myviewholder>{
+public class UserAdapter extends RecyclerView.Adapter<UserAdapter.myviewholder> {
 
     ArrayList<UserClass> list;
     Context context;
@@ -38,7 +38,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.myviewholder>{
     @NonNull
     @Override
     public myviewholder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.user_sample, parent, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.sample_user, parent, false);
         return new myviewholder(view);
     }
 
@@ -62,16 +62,15 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.myviewholder>{
                 .child(FirebaseAuth.getInstance().getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.exists()){
+                if (snapshot.exists()) {
                     holder.binding.followBtn.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.follow_active_btn));
                     holder.binding.followBtn.setText("Following");
                     holder.binding.followBtn.setTextColor(context.getResources().getColor(R.color.grey));
                     holder.binding.followBtn.setEnabled(false);
-                }
-                else{
+                } else {
                     // adding new follwers
                     holder.binding.followBtn.setOnClickListener(view -> {
-                        FollowModel follow = new FollowModel();
+                        Follow follow = new Follow();
                         follow.setFollowedBy(FirebaseAuth.getInstance().getUid());
                         follow.setFollowedAt(new Date().getTime());
 
@@ -87,12 +86,23 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.myviewholder>{
                                             .child(user.getUserId())
                                             .child("followerCount")
                                             .setValue(user.getFollowerCount() + 1).addOnSuccessListener(unused1 -> {
-                                                holder.binding.followBtn.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.follow_active_btn));
-                                                holder.binding.followBtn.setText("Following");
-                                                holder.binding.followBtn.setTextColor(context.getResources().getColor(R.color.grey));
-                                                holder.binding.followBtn.setEnabled(false);
-                                                Toast.makeText(context, "You Followed " + user.getName(), Toast.LENGTH_LONG).show();
-                                            });
+                                        holder.binding.followBtn.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.follow_active_btn));
+                                        holder.binding.followBtn.setText("Following");
+                                        holder.binding.followBtn.setTextColor(context.getResources().getColor(R.color.grey));
+                                        holder.binding.followBtn.setEnabled(false);
+                                        Toast.makeText(context, "You Followed " + user.getName(), Toast.LENGTH_LONG).show();
+
+                                        Notification notification = new Notification();
+                                        notification.setNotificationBy(FirebaseAuth.getInstance().getUid());
+                                        notification.setNotificationAt(new Date().getTime());
+                                        notification.setType("follow");
+
+                                        FirebaseDatabase.getInstance().getReference()
+                                                .child("notification")
+                                                .child(user.getUserId())
+                                                .push()
+                                                .setValue(notification);
+                                    });
                                 });
                     });
                 }
@@ -112,14 +122,14 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.myviewholder>{
         return list.size();
     }
 
-    class myviewholder extends RecyclerView.ViewHolder{
+    class myviewholder extends RecyclerView.ViewHolder {
 
-        UserSampleBinding binding;
+        SampleUserBinding binding;
 
         public myviewholder(@NonNull View itemView) {
             super(itemView);
 
-            binding = UserSampleBinding.bind(itemView);
+            binding = SampleUserBinding.bind(itemView);
         }
     }
 }

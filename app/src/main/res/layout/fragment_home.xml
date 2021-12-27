@@ -48,7 +48,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <View
-                android:id="@+id/view"
+                android:id="@+id/statusCircle"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:background="@drawable/orange_circle"
@@ -65,7 +65,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/view" />
+                app:layout_constraintTop_toBottomOf="@id/statusCircle" />
 
             <androidx.core.widget.NestedScrollView
                 android:id="@+id/horizontalScrollView"
@@ -104,7 +104,7 @@
                             app:riv_tile_mode="repeat" />
 
                         <View
-                            android:id="@+id/view3"
+                            android:id="@+id/v"
                             android:layout_width="0dp"
                             android:layout_height="0dp"
                             android:background="@drawable/black_shade"
@@ -119,14 +119,14 @@
                             android:layout_height="0dp"
                             android:background="@drawable/circle"
                             android:backgroundTint="@color/white"
-                            app:layout_constraintBottom_toBottomOf="@+id/imageView4"
-                            app:layout_constraintEnd_toEndOf="@+id/imageView4"
-                            app:layout_constraintStart_toStartOf="@+id/imageView4"
-                            app:layout_constraintTop_toTopOf="@+id/imageView4"
+                            app:layout_constraintBottom_toBottomOf="@+id/addStoryImg"
+                            app:layout_constraintEnd_toEndOf="@+id/addStoryImg"
+                            app:layout_constraintStart_toStartOf="@+id/addStoryImg"
+                            app:layout_constraintTop_toTopOf="@+id/addStoryImg"
                             tools:targetApi="lollipop" />
 
                         <ImageView
-                            android:id="@+id/imageView4"
+                            android:id="@+id/addStoryImg"
                             android:layout_width="@dimen/_30mdp"
                             android:layout_height="@dimen/_30mdp"
                             android:src="@drawable/ic_add_circle"
@@ -158,10 +158,12 @@
 <!--                    linear layout width is match parent-->
 <!--                    recyclerview width is wrap content-->
 
-                    <androidx.recyclerview.widget.RecyclerView
+                    <com.cooltechworks.views.shimmer.ShimmerRecyclerView
                         android:id="@+id/storyRV"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
+                        app:shimmer_demo_child_count="4"
+                        app:shimmer_demo_layout="@layout/demo_story"
                         android:layout_marginStart="@dimen/_16mdp"
                         android:layout_marginLeft="@dimen/_16mdp" />
 
@@ -179,7 +181,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/horizontalScrollView" />
 
-            <androidx.recyclerview.widget.RecyclerView
+            <com.cooltechworks.views.shimmer.ShimmerRecyclerView
                 android:id="@+id/dashboardRv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -188,6 +190,8 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginRight="16dp"
+                app:shimmer_demo_child_count="6"
+                app:shimmer_demo_layout="@layout/demo_post"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"

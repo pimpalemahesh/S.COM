@@ -23,7 +23,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.myinnovation.socom.Adapter.FollowersAdapter;
-import com.myinnovation.socom.Model.FollowModel;
+import com.myinnovation.socom.Model.Follow;
 import com.myinnovation.socom.Model.UserClass;
 import com.myinnovation.socom.R;
 import com.myinnovation.socom.databinding.FragmentProfileBinding;
@@ -35,7 +35,7 @@ public class ProfileFragment extends Fragment {
 
     FragmentProfileBinding binding;
 
-    ArrayList<FollowModel> list;
+    ArrayList<Follow> list;
     FirebaseAuth mAuth;
     FirebaseStorage storage;
     FirebaseDatabase mbase;
@@ -60,22 +60,25 @@ public class ProfileFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         binding = FragmentProfileBinding.inflate(inflater, container, false);
+        binding.friendRv.showShimmerAdapter();
 
         list = new ArrayList<>();
         FollowersAdapter adapter = new FollowersAdapter(list, getContext());
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         binding.friendRv.setLayoutManager(linearLayoutManager);
-        binding.friendRv.setAdapter(adapter);
+
         // setting followrs count
         mbase.getReference().child("Users")
                 .child(mAuth.getUid())
                 .child("followers").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for(DataSnapshot dataSnapshot : snapshot.getChildren()){
-                    FollowModel follow = dataSnapshot.getValue(FollowModel.class);
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    Follow follow = dataSnapshot.getValue(Follow.class);
                     list.add(follow);
                 }
+                binding.friendRv.setAdapter(adapter);
+                binding.friendRv.hideShimmerAdapter();
                 adapter.notifyDataSetChanged();
 
             }
@@ -92,7 +95,7 @@ public class ProfileFragment extends Fragment {
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if(snapshot.exists()){
+                        if (snapshot.exists()) {
                             UserClass user = snapshot.getValue(UserClass.class);
                             Picasso.get()
                                     .load(user.getCoverPhoto())
@@ -115,7 +118,6 @@ public class ProfileFragment extends Fragment {
 
                     }
                 });
-
 
 
         // change Cover photo of user
@@ -170,7 +172,7 @@ public class ProfileFragment extends Fragment {
                     });
         }
 
-        if(requestCode == 102 && data.getData() != null){
+        if (requestCode == 102 && data.getData() != null) {
             Uri uri = data.getData();
             binding.profileImage.setImageURI(uri);
 

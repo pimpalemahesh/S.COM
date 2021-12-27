@@ -49,8 +49,7 @@ public class SignUpActivity extends AppCompatActivity {
 
                                 Toast.makeText(getApplicationContext(), "Successfully Registered.", Toast.LENGTH_LONG).show();
                                 startActivity(new Intent(SignUpActivity.this, MainActivity.class));
-                            }
-                            else{
+                            } else {
                                 Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_LONG).show();
                             }
                         })
@@ -66,8 +65,7 @@ public class SignUpActivity extends AppCompatActivity {
 
 
                         });
-            }
-            catch (Exception e){
+            } catch (Exception e) {
                 binding.bar.setVisibility(View.INVISIBLE);
                 Objects.requireNonNull(binding.username.getEditText()).setText("");
                 Objects.requireNonNull(binding.userProfession.getEditText()).setText("");

@@ -33,8 +33,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
 
-
-
         setSupportActionBar(binding.toolbar);
         MainActivity.this.setTitle("My Profile");
 
@@ -46,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
         binding.readableBottomBar.setOnItemSelectListener(i -> {
             FragmentTransaction transaction1 = getSupportFragmentManager().beginTransaction();
 
-            switch (i){
+            switch (i) {
 
                 case 0:
                     binding.toolbar.setVisibility(View.GONE);
@@ -87,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.setting:
                 mAuth.signOut();
                 startActivity(new Intent(MainActivity.this, LoginActivity.class));

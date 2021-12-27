@@ -6,10 +6,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
+import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -17,6 +16,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.myinnovation.socom.Adapter.CommentAdapter;
 import com.myinnovation.socom.Model.Comment;
+import com.myinnovation.socom.Model.Notification;
 import com.myinnovation.socom.Model.Post;
 import com.myinnovation.socom.Model.UserClass;
 import com.myinnovation.socom.R;
@@ -41,6 +41,10 @@ public class CommentActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityCommentBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        setSupportActionBar(binding.toolbar2);
+        CommentActivity.this.setTitle("Comments");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         mAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
@@ -91,10 +95,11 @@ public class CommentActivity extends AppCompatActivity {
             }
         });
 
-        if(binding.commentText.getText().toString().equals("")){
-            Toast.makeText(getApplicationContext(), "You have not entered any comment yet!", Toast.LENGTH_LONG).show();
-        } else {
-            binding.commentPostBtn.setOnClickListener(v -> {
+
+        binding.commentPostBtn.setOnClickListener(v -> {
+            if (binding.commentText.getText().toString().equals("")) {
+                Toast.makeText(getApplicationContext(), "You have not entered any comment yet!", Toast.LENGTH_LONG).show();
+            } else {
                 Comment comment = new Comment();
                 comment.setCommentBody(binding.commentText.getText().toString());
                 comment.setCommentAt(new Date().getTime());
@@ -111,7 +116,7 @@ public class CommentActivity extends AppCompatActivity {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
                                 int commentCount = 0;
-                                if(snapshot.exists()){
+                                if (snapshot.exists()) {
                                     commentCount = snapshot.getValue(Integer.class);
                                 }
                                 database.getReference()
@@ -121,6 +126,19 @@ public class CommentActivity extends AppCompatActivity {
                                         .setValue(commentCount + 1).addOnSuccessListener(unused1 -> {
                                     Toast.makeText(getApplicationContext(), "Commented Successfully", Toast.LENGTH_LONG).show();
                                     binding.commentText.setText("");
+
+                                    Notification notification = new Notification();
+                                    notification.setNotificationBy(FirebaseAuth.getInstance().getUid());
+                                    notification.setNotificationAt(new Date().getTime());
+                                    notification.setPostId(postId);
+                                    notification.setPostedBy(postedBy);
+                                    notification.setType("comment");
+
+                                    FirebaseDatabase.getInstance().getReference()
+                                            .child("notification")
+                                            .child(postedBy)
+                                            .push()
+                                            .setValue(notification);
                                 });
                             }
 
@@ -129,9 +147,8 @@ public class CommentActivity extends AppCompatActivity {
 
                             }
                         }));
-
-            });
-        }
+            }
+        });
 
 
         CommentAdapter adapter = new CommentAdapter(getApplicationContext(), list);
@@ -145,7 +162,7 @@ public class CommentActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 list.clear();
-                for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     Comment comment = dataSnapshot.getValue(Comment.class);
                     list.add(comment);
                 }
@@ -157,5 +174,11 @@ public class CommentActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        finish();
+        return super.onOptionsItemSelected(item);
     }
 }

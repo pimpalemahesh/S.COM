@@ -1,11 +1,11 @@
 package com.myinnovation.socom.Model;
 
-public class FollowModel {
+public class Follow {
 
     private String followedBy;
     private long followedAt;
 
-    public FollowModel() {
+    public Follow() {
     }
 
     public String getFollowedBy() {
@@ -24,7 +24,7 @@ public class FollowModel {
         this.followedAt = followedAt;
     }
 
-    public FollowModel(String followedBy, long followedAt) {
+    public Follow(String followedBy, long followedAt) {
         this.followedBy = followedBy;
         this.followedAt = followedAt;
     }

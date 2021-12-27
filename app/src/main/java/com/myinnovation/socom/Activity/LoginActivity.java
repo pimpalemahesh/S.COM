@@ -29,7 +29,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityLoginBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         binding.gotosignup.setOnClickListener(view -> startActivity(new Intent(LoginActivity.this, SignUpActivity.class)));
 
@@ -42,10 +42,10 @@ public class LoginActivity extends AppCompatActivity {
 
             binding.bar.setVisibility(View.VISIBLE);
 
-            try{
+            try {
                 mAuth.signInWithEmailAndPassword(Objects.requireNonNull(binding.emailLogin.getEditText()).getText().toString(), Objects.requireNonNull(binding.passwordLogin.getEditText()).getText().toString())
                         .addOnCompleteListener(task -> {
-                            if(task.isSuccessful()){
+                            if (task.isSuccessful()) {
                                 binding.bar.setVisibility(View.INVISIBLE);
                                 startActivity(new Intent(LoginActivity.this, MainActivity.class));
                             }
@@ -54,10 +54,9 @@ public class LoginActivity extends AppCompatActivity {
                             binding.bar.setVisibility(View.INVISIBLE);
                             binding.emailLogin.getEditText().setText("");
                             binding.passwordLogin.getEditText().setText("");
-                            Toast.makeText(getApplicationContext(), "Failed to log in: " + e.getMessage(), + Toast.LENGTH_LONG).show();
+                            Toast.makeText(getApplicationContext(), "Failed to log in: " + e.getMessage(), +Toast.LENGTH_LONG).show();
                         });
-            }
-            catch (Exception e){
+            } catch (Exception e) {
                 binding.bar.setVisibility(View.INVISIBLE);
                 Objects.requireNonNull(binding.emailLogin.getEditText()).setText("");
                 Objects.requireNonNull(binding.passwordLogin.getEditText()).setText("");
@@ -70,19 +69,19 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        if(currentuser != null){
+        if (currentuser != null) {
             startActivity(new Intent(LoginActivity.this, MainActivity.class));
         }
     }
 
     @Override
     public void onBackPressed() {
-        if(backPressedTime + 2000 > System.currentTimeMillis()){
+        if (backPressedTime + 2000 > System.currentTimeMillis()) {
             backToast.cancel();
             super.onBackPressed();
             finishAffinity();
             return;
-        } else{
+        } else {
             backToast = Toast.makeText(getApplicationContext(), "Press back again to exit", Toast.LENGTH_SHORT);
             backToast.show();
         }

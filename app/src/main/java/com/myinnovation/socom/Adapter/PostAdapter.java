@@ -5,26 +5,25 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.myinnovation.socom.Activity.CommentActivity;
+import com.myinnovation.socom.Model.Notification;
 import com.myinnovation.socom.Model.Post;
 import com.myinnovation.socom.Model.UserClass;
 import com.myinnovation.socom.R;
-import com.myinnovation.socom.databinding.DashboardRvSampleBinding;
+import com.myinnovation.socom.databinding.SampleDashboardBinding;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.myviewholder> {
 
@@ -39,7 +38,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.myviewholder> 
     @NonNull
     @Override
     public myviewholder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.dashboard_rv_sample, parent, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.sample_dashboard, parent, false);
         return new myviewholder(view);
     }
 
@@ -56,10 +55,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.myviewholder> 
         holder.binding.like.setText(model.getPostLike() + "");
         holder.binding.comment.setText(model.getCommentCount() + "");
         String description = model.getPostDescription();
-        if(description.equals("")){
+        if (description.equals("")) {
             holder.binding.postDescription.setVisibility(View.GONE);
-        }
-        else{
+        } else {
             holder.binding.postDescription.setVisibility(View.VISIBLE);
             holder.binding.postDescription.setText(model.getPostDescription());
         }
@@ -97,10 +95,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.myviewholder> 
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if(snapshot.exists()){
+                        if (snapshot.exists()) {
                             holder.binding.like.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_userliked, 0, 0, 0);
-                        }
-                        else{
+                        } else {
                             // if user liked post then first create like node then set its value to true then create postLike node increase count
                             // and change drawable left to with new image.
                             holder.binding.like.setOnClickListener(view -> FirebaseDatabase.getInstance().getReference()
@@ -112,7 +109,23 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.myviewholder> 
                                             .child("posts")
                                             .child(model.getPostId())
                                             .child("postLike")
-                                            .setValue(model.getPostLike() + 1).addOnSuccessListener(unused1 -> holder.binding.like.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_userliked, 0, 0, 0))));
+                                            .setValue(model.getPostLike() + 1).addOnSuccessListener(unused1 -> {
+                                                holder.binding.like.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_userliked, 0, 0, 0);
+
+                                                Notification notification = new Notification();
+                                                notification.setNotificationBy(FirebaseAuth.getInstance().getUid());
+                                                notification.setNotificationAt(new Date().getTime());
+                                                notification.setPostId(model.getPostId());
+                                                notification.setPostedBy(model.getPostBy());
+                                                notification.setType("like");
+
+                                                FirebaseDatabase.getInstance().getReference()
+                                                        .child("notification")
+                                                        .child(model.getPostBy())
+                                                        .push()
+                                                        .setValue(notification);
+
+                                            })));
                         }
                     }
 
@@ -136,14 +149,14 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.myviewholder> 
         return list.size();
     }
 
-    class myviewholder extends RecyclerView.ViewHolder{
+    class myviewholder extends RecyclerView.ViewHolder {
 
-        DashboardRvSampleBinding binding;
+        SampleDashboardBinding binding;
 
         public myviewholder(@NonNull View itemView) {
             super(itemView);
 
-            binding = DashboardRvSampleBinding.bind(itemView);
+            binding = SampleDashboardBinding.bind(itemView);
         }
     }
 }

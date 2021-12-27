@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <View
+            android:id="@+id/postDescription"
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:background="#EAEAEA"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/postImage" />
+
+        <View
+            android:id="@+id/userName"
+            android:layout_width="140dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="8dp"
+            android:background="#EAEAEA"
+            app:layout_constraintBottom_toBottomOf="@+id/post_profileImage"
+            app:layout_constraintStart_toEndOf="@+id/post_profileImage"
+            app:layout_constraintTop_toTopOf="@+id/post_profileImage"
+            app:layout_constraintVertical_bias="0.16000003" />
+
+        <View
+            android:id="@+id/profession"
+            android:layout_width="100dp"
+            android:layout_height="20dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintStart_toStartOf="@+id/userName"
+            app:layout_constraintTop_toBottomOf="@+id/userName" />
+
+        <View
+            android:id="@+id/post_profileImage"
+            android:layout_width="@dimen/_40mdp"
+            android:layout_height="@dimen/_40mdp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/circle"
+            android:backgroundTint="#EAEAEA"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <View
+            android:id="@+id/postImage"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_150mdp"
+            android:layout_marginTop="16dp"
+            android:background="#EAEAEA"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/post_profileImage"
+            app:riv_mutate_background="true" />
+
+        <View
+            android:id="@+id/like"
+            android:layout_width="45dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="16dp"
+            android:background="#EAEAEA"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/postDescription" />
+
+        <View
+            android:id="@+id/comment"
+            android:layout_width="45dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="16dp"
+            android:background="#EAEAEA"
+            app:layout_constraintStart_toEndOf="@+id/like"
+            app:layout_constraintTop_toTopOf="@+id/like" />
+
+        <View
+            android:id="@+id/share"
+            android:layout_width="45dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="16dp"
+            android:background="#EAEAEA"
+            app:layout_constraintStart_toEndOf="@+id/comment"
+            app:layout_constraintTop_toTopOf="@+id/comment" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</RelativeLayout>

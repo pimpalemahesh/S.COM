@@ -51,23 +51,25 @@ public class SearchFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         binding = FragmentSearchBinding.inflate(inflater, container, false);
+        binding.userRv.showShimmerAdapter();
 
         UserAdapter adapter = new UserAdapter(list, getContext());
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         binding.userRv.setLayoutManager(layoutManager);
-        binding.userRv.setAdapter(adapter);
 
         mbase.getReference().child("Users")
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         list.clear();
-                        for(DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                             UserClass user = dataSnapshot.getValue(UserClass.class);
                             user.setUserId(dataSnapshot.getKey());
                             if (!dataSnapshot.getKey().equals(FirebaseAuth.getInstance().getUid())) {
                                 list.add(user);
                             }
+                            binding.userRv.setAdapter(adapter);
+                            binding.userRv.hideShimmerAdapter();
                             adapter.notifyDataSetChanged();
                         }
                     }
