@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Social</string>
+    <string name="app_name">S.COM</string>
 
     <string name="home">Home</string>
     <string name="notification">Notification</string>
@@ -22,9 +22,17 @@
     <string name="don_t_have_an_account">Don\'t have an Account?</string>
     <string name="name">Name</string>
     <string name="profession">Profession</string>
-    <string name="welcome_to_socom">Welcome To SOCOM</string>
+    <string name="welcome_to_socom">Welcome To S.COM</string>
     <string name="already_have_an_accont">Already have an accont?</string>
     <string name="login">Sign In</string>
     <string name="follow">Follow</string>
     <string name="add_people">Add People</string>
+    <string name="oops_no_internet_nplease_check_your_internet_connection_and_try_again">Oops! No Internet\nPlease check your Internet connection and try again...</string>
+    <string name="enter_your_comment">Enter your comment</string>
+    <string name="whats_in_your_mind">Whats in your mind?</string>
+    <string name="add_to_your_post">Add to your Post</string>
+    <string name="app_description">S.COM is a platform where you can post your interest and people give their feedbacks.\nSee what is in your friend\'s mind</string>
+    <string name="my_friends">My Friends</string>
+    <string name="zero">0</string>
+    <string name="refresh">Refresh</string>
 </resources>

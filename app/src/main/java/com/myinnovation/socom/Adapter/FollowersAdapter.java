@@ -1,9 +1,12 @@
 package com.myinnovation.socom.Adapter;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -16,6 +19,7 @@ import com.myinnovation.socom.Model.Follow;
 import com.myinnovation.socom.Model.UserClass;
 import com.myinnovation.socom.R;
 import com.myinnovation.socom.databinding.SampleFollowersBinding;
+import com.myinnovation.socom.databinding.SampleViewUserDataBinding;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -24,6 +28,9 @@ public class FollowersAdapter extends RecyclerView.Adapter<FollowersAdapter.myvi
 
     ArrayList<Follow> list;
     Context context;
+    Activity activity;
+    View view;
+    ViewGroup viewGroup;
 
     public FollowersAdapter() {
 
@@ -37,6 +44,7 @@ public class FollowersAdapter extends RecyclerView.Adapter<FollowersAdapter.myvi
     @NonNull
     @Override
     public myviewholder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        viewGroup = parent;
         View view = LayoutInflater.from(context).inflate(R.layout.sample_followers, parent, false);
         return new myviewholder(view);
     }
@@ -54,8 +62,28 @@ public class FollowersAdapter extends RecyclerView.Adapter<FollowersAdapter.myvi
                         UserClass user = snapshot.getValue(UserClass.class);
                         Picasso.get()
                                 .load(user.getProfile_image())
-                                .placeholder(R.drawable.user_logo)
+                                .placeholder(R.drawable.ic_user)
                                 .into(holder.binding.profileImage);
+
+
+                        holder.binding.profileImage.setOnClickListener(v -> {
+                            view = LayoutInflater.from(context).inflate(R.layout.sample_view_user_data, viewGroup, false);
+                            viewGroup.removeView(view);
+                            SampleViewUserDataBinding bd = SampleViewUserDataBinding.bind(view);
+                            bd.name.setText(user.getName());
+                            bd.profession.setText(user.getProfession());
+                            Picasso.get()
+                                    .load(user.getProfile_image())
+                                    .placeholder(R.drawable.ic_user)
+                                    .into(bd.profileImage);
+
+                            AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+                            builder.setTitle("User Details");
+                            builder.setView(bd.getRoot());
+                            builder.setCancelable(true);
+                            builder.create();
+                            builder.show();
+                        });
                     }
 
                     @Override

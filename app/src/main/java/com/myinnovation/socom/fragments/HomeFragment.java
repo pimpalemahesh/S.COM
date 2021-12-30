@@ -1,5 +1,6 @@
 package com.myinnovation.socom.fragments;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.net.Uri;
 import android.os.Bundle;
@@ -26,6 +27,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.myinnovation.socom.Activity.CommentActivity;
 import com.myinnovation.socom.Adapter.PostAdapter;
 import com.myinnovation.socom.Adapter.StoryAdapter;
 import com.myinnovation.socom.Model.Post;
@@ -34,6 +36,7 @@ import com.myinnovation.socom.Model.UserClass;
 import com.myinnovation.socom.Model.UserStories;
 import com.myinnovation.socom.R;
 import com.myinnovation.socom.databinding.FragmentHomeBinding;
+import com.myinnovation.socom.databinding.SampleViewUserDataBinding;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -93,8 +96,28 @@ public class HomeFragment extends Fragment {
                             UserClass user = snapshot.getValue(UserClass.class);
                             Picasso.get()
                                     .load(user.getProfile_image())
-                                    .placeholder(R.drawable.profile)
+                                    .placeholder(R.drawable.ic_user)
                                     .into(binding.profileImage);
+
+                            binding.profileImage.setOnClickListener(v -> {
+                                ViewGroup viewGroup = container;
+                                View view = LayoutInflater.from(getActivity().getApplicationContext()).inflate(R.layout.sample_view_user_data, viewGroup, false);
+                                viewGroup.removeView(view);
+                                SampleViewUserDataBinding bd = SampleViewUserDataBinding.bind(view);
+                                bd.name.setText(user.getName());
+                                bd.profession.setText(user.getProfession());
+                                Picasso.get()
+                                        .load(user.getProfile_image())
+                                        .placeholder(R.drawable.ic_user)
+                                        .into(bd.profileImage);
+
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                                builder.setTitle("User Details");
+                                builder.setView(bd.getRoot());
+                                builder.setCancelable(true);
+                                builder.create();
+                                builder.show();
+                            });
                         }
                     }
 
@@ -107,7 +130,7 @@ public class HomeFragment extends Fragment {
         storylist = new ArrayList<>();
 
 
-        StoryAdapter adapter = new StoryAdapter(storylist, getContext());
+        StoryAdapter adapter = new StoryAdapter(storylist, getContext(), getActivity());
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
 
         binding.storyRV.setLayoutManager(linearLayoutManager);
@@ -146,7 +169,7 @@ public class HomeFragment extends Fragment {
 
         postlist = new ArrayList<>();
 
-        PostAdapter postAdapter = new PostAdapter(postlist, getContext());
+        PostAdapter postAdapter = new PostAdapter(postlist, getContext(), getActivity());
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         binding.dashboardRv.setLayoutManager(layoutManager);
         binding.dashboardRv.addItemDecoration(new DividerItemDecoration(binding.dashboardRv.getContext(), DividerItemDecoration.VERTICAL));
@@ -186,40 +209,27 @@ public class HomeFragment extends Fragment {
                     .child(FirebaseAuth.getInstance().getUid())
                     .child(new Date().getTime() + "");
 
-            storageReference.putFile(result).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            storageReference.putFile(result).addOnSuccessListener(taskSnapshot -> storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                 @Override
-                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                        @Override
-                        public void onSuccess(Uri uri) {
-                            Story story = new Story();
-                            story.setStoryAt(new Date().getTime());
-                            mbase.getReference()
-                                    .child("stories")
-                                    .child(FirebaseAuth.getInstance().getUid())
-                                    .child("postBy")
-                                    .setValue(story.getStoryAt()).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void unused) {
-                                    UserStories stories = new UserStories(uri.toString(), story.getStoryAt());
+                public void onSuccess(Uri uri) {
+                    Story story = new Story();
+                    story.setStoryAt(new Date().getTime());
+                    mbase.getReference()
+                            .child("stories")
+                            .child(FirebaseAuth.getInstance().getUid())
+                            .child("postBy")
+                            .setValue(story.getStoryAt()).addOnSuccessListener(unused -> {
+                                UserStories stories = new UserStories(uri.toString(), story.getStoryAt());
 
-                                    mbase.getReference()
-                                            .child("stories")
-                                            .child(FirebaseAuth.getInstance().getUid())
-                                            .child("userStories")
-                                            .push()
-                                            .setValue(stories).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void unused) {
-                                            dialog.dismiss();
-                                        }
-                                    });
-                                }
+                                mbase.getReference()
+                                        .child("stories")
+                                        .child(FirebaseAuth.getInstance().getUid())
+                                        .child("userStories")
+                                        .push()
+                                        .setValue(stories).addOnSuccessListener(unused1 -> dialog.dismiss());
                             });
-                        }
-                    });
                 }
-            });
+            }));
 
         });
         return binding.getRoot();

@@ -32,7 +32,6 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-
         setSupportActionBar(binding.toolbar);
         MainActivity.this.setTitle("My Profile");
 
@@ -92,5 +91,10 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+
     }
 }

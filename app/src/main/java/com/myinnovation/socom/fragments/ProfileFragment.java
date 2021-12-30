@@ -104,12 +104,19 @@ public class ProfileFragment extends Fragment {
 
                             Picasso.get()
                                     .load(user.getProfile_image())
-                                    .placeholder(R.drawable.ic_image)
+                                    .placeholder(R.drawable.ic_user)
                                     .into(binding.profileImage);
+
+                            if(binding.verifyAccount.getVisibility() == View.GONE){
+                                binding.verifyAccount.setVisibility(View.VISIBLE);
+                            } else{
+                                binding.verifyAccount.setVisibility(View.GONE);
+                            }
 
                             binding.UserName.setText(user.getName());
                             binding.Profession.setText(user.getProfession());
                             binding.followers.setText(user.getFollowerCount() + "");
+
                         }
                     }
 
@@ -129,7 +136,7 @@ public class ProfileFragment extends Fragment {
         });
 
         // change Profile Image
-        binding.verifyAccount.setOnClickListener(view -> {
+        binding.profileImage.setOnClickListener(view -> {
             Intent intent = new Intent();
             intent.setAction(Intent.ACTION_GET_CONTENT);
             intent.setType("image/*");
@@ -185,7 +192,9 @@ public class ProfileFragment extends Fragment {
 
                         storageReference.getDownloadUrl()
                                 .addOnSuccessListener(uri12 -> mbase.getReference().child("Users").child(mAuth.getUid()).child("profile_image").setValue(uri12.toString()))
-                                .addOnFailureListener(e -> Toast.makeText(getContext(), "Error : " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                                .addOnFailureListener(e -> {
+                                    Toast.makeText(getContext(), "Error : " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                });
                     })
                     .addOnProgressListener(snapshot -> {
                         int per = (int) ((100 * snapshot.getBytesTransferred()) / snapshot.getTotalByteCount());

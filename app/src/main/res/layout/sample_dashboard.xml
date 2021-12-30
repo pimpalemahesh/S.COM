@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -10,9 +9,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginLeft="16dp"
         android:layout_marginTop="8dp"
-        android:text="TextView"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -24,7 +21,7 @@
         android:layout_width="@dimen/_40mdp"
         android:layout_height="@dimen/_40mdp"
         android:layout_marginTop="8dp"
-        android:src="@drawable/bill"
+        android:src="@drawable/ic_user"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -41,9 +38,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
         android:fontFamily="@font/baloo"
-        android:text="Bill Gates"
         android:textColor="@color/black"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/post_profileImage"
@@ -55,7 +50,6 @@
         android:id="@+id/profession"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Microsoft Founder"
         app:layout_constraintStart_toStartOf="@+id/userName"
         app:layout_constraintTop_toBottomOf="@+id/userName" />
 
@@ -64,7 +58,6 @@
         android:layout_width="@dimen/_18mdp"
         android:layout_height="@dimen/_18mdp"
         android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
         android:src="@drawable/ic_baseline_more_vert_24"
         app:layout_constraintBottom_toBottomOf="@+id/post_profileImage"
         app:layout_constraintEnd_toEndOf="parent"
@@ -76,7 +69,7 @@
         android:layout_height="@dimen/_150mdp"
         android:layout_marginTop="16dp"
         android:scaleType="center"
-        android:src="@drawable/budhha"
+        android:src="@drawable/ic_image"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
@@ -89,7 +82,6 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginRight="16dp"
         android:src="@drawable/ic_bookmark"
         app:layout_constraintEnd_toEndOf="@+id/postImage"
         app:layout_constraintTop_toTopOf="@+id/postImage" />
@@ -99,12 +91,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginLeft="16dp"
         android:drawablePadding="4dp"
         android:gravity="center"
-        android:text="126"
         android:textColor="@color/black"
         android:textStyle="bold"
+        android:text="@string/zero"
         app:drawableLeftCompat="@drawable/ic_like"
         app:layout_constraintEnd_toStartOf="@+id/comment"
         app:layout_constraintHorizontal_bias="0.0"
@@ -117,34 +108,32 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginLeft="16dp"
-        android:drawableLeft="@drawable/ic_comment"
         android:drawablePadding="4dp"
         android:gravity="center"
-        android:text="55"
         android:textColor="@color/black"
         android:textStyle="bold"
+        android:text="@string/zero"
         app:layout_constraintEnd_toStartOf="@+id/share"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/like"
-        app:layout_constraintTop_toTopOf="@+id/share" />
+        app:layout_constraintTop_toTopOf="@+id/share"
+        app:drawableStartCompat="@drawable/ic_comment" />
 
     <TextView
         android:id="@+id/share"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginLeft="16dp"
         android:layout_marginTop="8dp"
-        android:drawableLeft="@drawable/ic_share"
         android:drawablePadding="4dp"
         android:gravity="center"
-        android:text="107"
         android:textColor="@color/black"
         android:textStyle="bold"
+        android:text="@string/zero"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/comment"
-        app:layout_constraintTop_toBottomOf="@+id/postDescription" />
+        app:layout_constraintTop_toBottomOf="@+id/postDescription"
+        app:drawableLeftCompat="@drawable/ic_share" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

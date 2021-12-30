@@ -7,6 +7,7 @@ import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -58,7 +59,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                         String text = TimeAgo.using(notification.getNotificationAt());
                         Picasso.get()
                                 .load(user.getProfile_image())
-                                .placeholder(R.drawable.user_logo)
+                                .placeholder(R.drawable.ic_user)
                                 .into(holder.binding.profileImage);
 
                         holder.binding.time.setText(text);
@@ -100,6 +101,8 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                     intent.putExtra("postedBy", notification.getPostedBy());
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     context.startActivity(intent);
+                } else {
+                    
                 }
 
             }

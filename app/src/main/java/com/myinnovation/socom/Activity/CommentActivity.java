@@ -4,9 +4,13 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -21,6 +25,7 @@ import com.myinnovation.socom.Model.Post;
 import com.myinnovation.socom.Model.UserClass;
 import com.myinnovation.socom.R;
 import com.myinnovation.socom.databinding.ActivityCommentBinding;
+import com.myinnovation.socom.databinding.SampleViewUserDataBinding;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -53,6 +58,7 @@ public class CommentActivity extends AppCompatActivity {
         postId = intent.getStringExtra("postId");
         postedBy = intent.getStringExtra("postedBy");
 
+        // Takin data of post from database
         database.getReference()
                 .child("posts")
                 .child(postId).addValueEventListener(new ValueEventListener() {
@@ -61,7 +67,7 @@ public class CommentActivity extends AppCompatActivity {
                 Post post = snapshot.getValue(Post.class);
                 Picasso.get()
                         .load(post.getPostImage())
-                        .placeholder(R.drawable.budhha)
+                        .placeholder(R.drawable.ic_image)
                         .into(binding.postImage);
 
                 binding.description.setText(post.getPostDescription());
@@ -75,6 +81,7 @@ public class CommentActivity extends AppCompatActivity {
             }
         });
 
+        // Taking data of user from database
         database.getReference()
                 .child("Users")
                 .child(postedBy).addValueEventListener(new ValueEventListener() {
@@ -83,10 +90,30 @@ public class CommentActivity extends AppCompatActivity {
                 UserClass user = snapshot.getValue(UserClass.class);
                 Picasso.get()
                         .load(user.getProfile_image())
-                        .placeholder(R.drawable.user_logo)
+                        .placeholder(R.drawable.ic_user)
                         .into(binding.profileImage);
 
                 binding.name.setText(user.getName());
+
+                binding.profileImage.setOnClickListener(v -> {
+                    ViewGroup viewGroup = findViewById(R.id.commentActivity);
+                    View view = LayoutInflater.from(getApplicationContext()).inflate(R.layout.sample_view_user_data, viewGroup, false);
+                    viewGroup.removeView(view);
+                    SampleViewUserDataBinding bd = SampleViewUserDataBinding.bind(view);
+                    bd.name.setText(user.getName());
+                    bd.profession.setText(user.getProfession());
+                    Picasso.get()
+                            .load(user.getProfile_image())
+                            .placeholder(R.drawable.ic_user)
+                            .into(bd.profileImage);
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(CommentActivity.this);
+                    builder.setTitle("User Details");
+                    builder.setView(bd.getRoot());
+                    builder.setCancelable(true);
+                    builder.create();
+                    builder.show();
+                });
             }
 
             @Override
@@ -96,6 +123,7 @@ public class CommentActivity extends AppCompatActivity {
         });
 
 
+        // sending comment
         binding.commentPostBtn.setOnClickListener(v -> {
             if (binding.commentText.getText().toString().equals("")) {
                 Toast.makeText(getApplicationContext(), "You have not entered any comment yet!", Toast.LENGTH_LONG).show();
@@ -104,6 +132,7 @@ public class CommentActivity extends AppCompatActivity {
                 comment.setCommentBody(binding.commentText.getText().toString());
                 comment.setCommentAt(new Date().getTime());
                 comment.setCommentedBy(FirebaseAuth.getInstance().getUid());
+
                 database.getReference()
                         .child("posts")
                         .child(postId)
@@ -151,7 +180,7 @@ public class CommentActivity extends AppCompatActivity {
         });
 
 
-        CommentAdapter adapter = new CommentAdapter(getApplicationContext(), list);
+        CommentAdapter adapter = new CommentAdapter(getApplicationContext(), list, CommentActivity.this);
         binding.commentRv.setLayoutManager(new LinearLayoutManager(this));
         binding.commentRv.setAdapter(adapter);
 

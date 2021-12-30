@@ -1,5 +1,7 @@
 package com.myinnovation.socom.Adapter;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -20,6 +23,7 @@ import com.myinnovation.socom.Model.Notification;
 import com.myinnovation.socom.Model.UserClass;
 import com.myinnovation.socom.R;
 import com.myinnovation.socom.databinding.SampleUserBinding;
+import com.myinnovation.socom.databinding.SampleViewUserDataBinding;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -29,15 +33,20 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.myviewholder> 
 
     ArrayList<UserClass> list;
     Context context;
+    Activity activity;
+    View view;
+    ViewGroup viewGroup;
 
-    public UserAdapter(ArrayList<UserClass> list, Context context) {
+    public UserAdapter(ArrayList<UserClass> list, Context context, Activity activity) {
         this.list = list;
         this.context = context;
+        this.activity = activity;
     }
 
     @NonNull
     @Override
     public myviewholder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        viewGroup = parent;
         View view = LayoutInflater.from(context).inflate(R.layout.sample_user, parent, false);
         return new myviewholder(view);
     }
@@ -48,11 +57,30 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.myviewholder> 
 
         Picasso.get()
                 .load(user.getProfile_image())
-                .placeholder(R.drawable.imgicon)
+                .placeholder(R.drawable.ic_image)
                 .into(holder.binding.followProfileImage);
 
         holder.binding.profession.setText(user.getProfession());
         holder.binding.name.setText(user.getName());
+
+        holder.binding.followProfileImage.setOnClickListener(v -> {
+            view = LayoutInflater.from(context).inflate(R.layout.sample_view_user_data, viewGroup, false);
+            viewGroup.removeView(view);
+            SampleViewUserDataBinding bd = SampleViewUserDataBinding.bind(view);
+            bd.name.setText(user.getName());
+            bd.profession.setText(user.getProfession());
+            Picasso.get()
+                    .load(user.getProfile_image())
+                    .placeholder(R.drawable.ic_user)
+                    .into(bd.profileImage);
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+            builder.setTitle("User Details");
+            builder.setView(bd.getRoot());
+            builder.setCancelable(true);
+            builder.create();
+            builder.show();
+        });
 
         // checking follwers if exist already.
         FirebaseDatabase.getInstance().getReference()
@@ -86,11 +114,14 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.myviewholder> 
                                             .child(user.getUserId())
                                             .child("followerCount")
                                             .setValue(user.getFollowerCount() + 1).addOnSuccessListener(unused1 -> {
+
                                         holder.binding.followBtn.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.follow_active_btn));
                                         holder.binding.followBtn.setText("Following");
                                         holder.binding.followBtn.setTextColor(context.getResources().getColor(R.color.grey));
                                         holder.binding.followBtn.setEnabled(false);
                                         Toast.makeText(context, "You Followed " + user.getName(), Toast.LENGTH_LONG).show();
+
+
 
                                         Notification notification = new Notification();
                                         notification.setNotificationBy(FirebaseAuth.getInstance().getUid());

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -25,7 +26,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:layout_marginLeft="16dp"
                 android:fontFamily="@font/abril_fatface"
                 android:text="@string/find_me"
                 android:textColor="@color/black"
@@ -42,8 +42,7 @@
                 android:layout_height="@dimen/_40mdp"
                 android:layout_marginTop="4dp"
                 android:layout_marginEnd="16dp"
-                android:layout_marginRight="16dp"
-                android:src="@drawable/profile"
+                android:src="@drawable/ic_user"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -91,10 +90,10 @@
                             android:id="@+id/story"
                             android:layout_width="@dimen/_130mdp"
                             android:layout_height="@dimen/_85mdp"
-                            android:layout_marginStart="16dp"
-                            android:layout_marginLeft="16dp"
                             android:scaleType="centerCrop"
-                            android:src="@drawable/budhha"
+                            android:src="@drawable/ic_image"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
                             app:riv_border_color="#333333"
@@ -154,18 +153,13 @@
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
-<!--                    horizontal scrollview is changed to nestedscrollview-->
-<!--                    linear layout width is match parent-->
-<!--                    recyclerview width is wrap content-->
-
                     <com.cooltechworks.views.shimmer.ShimmerRecyclerView
                         android:id="@+id/storyRV"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         app:shimmer_demo_child_count="4"
                         app:shimmer_demo_layout="@layout/demo_story"
-                        android:layout_marginStart="@dimen/_16mdp"
-                        android:layout_marginLeft="@dimen/_16mdp" />
+                        android:layout_marginStart="@dimen/_16mdp" />
 
                 </LinearLayout>
             </androidx.core.widget.NestedScrollView>

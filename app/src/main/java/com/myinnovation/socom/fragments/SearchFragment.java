@@ -53,7 +53,7 @@ public class SearchFragment extends Fragment {
         binding = FragmentSearchBinding.inflate(inflater, container, false);
         binding.userRv.showShimmerAdapter();
 
-        UserAdapter adapter = new UserAdapter(list, getContext());
+        UserAdapter adapter = new UserAdapter(list, getContext(), getActivity());
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         binding.userRv.setLayoutManager(layoutManager);
 
