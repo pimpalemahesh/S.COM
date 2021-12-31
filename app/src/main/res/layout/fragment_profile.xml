@@ -298,7 +298,7 @@
                         app:layout_constraintTop_toTopOf="@+id/friendtext" />
 
                     <TextView
-                        android:id="@+id/textView11"
+                        android:id="@+id/posts"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="@color/black"

@@ -84,14 +84,15 @@
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp">
 
                         <com.makeramen.roundedimageview.RoundedImageView
                             android:id="@+id/story"
                             android:layout_width="@dimen/_130mdp"
                             android:layout_height="@dimen/_85mdp"
                             android:scaleType="centerCrop"
-                            android:src="@drawable/ic_image"
+                            android:src="@drawable/applogo"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"

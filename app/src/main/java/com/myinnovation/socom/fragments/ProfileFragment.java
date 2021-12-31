@@ -39,6 +39,7 @@ public class ProfileFragment extends Fragment {
     FirebaseAuth mAuth;
     FirebaseStorage storage;
     FirebaseDatabase mbase;
+    int fd;
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -67,6 +68,7 @@ public class ProfileFragment extends Fragment {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         binding.friendRv.setLayoutManager(linearLayoutManager);
 
+
         // setting followrs count
         mbase.getReference().child("Users")
                 .child(mAuth.getUid())
@@ -75,6 +77,9 @@ public class ProfileFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     Follow follow = dataSnapshot.getValue(Follow.class);
+                    if(follow.getFollowedBy().equals(mAuth.getUid())){
+                        Toast.makeText(getContext(), "I Got", Toast.LENGTH_LONG).show();
+                    }
                     list.add(follow);
                 }
                 binding.friendRv.setAdapter(adapter);
@@ -107,7 +112,7 @@ public class ProfileFragment extends Fragment {
                                     .placeholder(R.drawable.ic_user)
                                     .into(binding.profileImage);
 
-                            if(binding.verifyAccount.getVisibility() == View.GONE){
+                            if(snapshot.child("profile_image").exists()){
                                 binding.verifyAccount.setVisibility(View.VISIBLE);
                             } else{
                                 binding.verifyAccount.setVisibility(View.GONE);
@@ -116,6 +121,9 @@ public class ProfileFragment extends Fragment {
                             binding.UserName.setText(user.getName());
                             binding.Profession.setText(user.getProfession());
                             binding.followers.setText(user.getFollowerCount() + "");
+                            binding.friend.setText(user.getFriendCount() + "");
+                            binding.posts.setText(user.getPostCount() + "");
+
 
                         }
                     }
@@ -191,7 +199,10 @@ public class ProfileFragment extends Fragment {
                         Toast.makeText(getContext(), "Profile Photo saved.", Toast.LENGTH_LONG).show();
 
                         storageReference.getDownloadUrl()
-                                .addOnSuccessListener(uri12 -> mbase.getReference().child("Users").child(mAuth.getUid()).child("profile_image").setValue(uri12.toString()))
+                                .addOnSuccessListener(uri12 -> {
+                                    mbase.getReference().child("Users").child(mAuth.getUid()).child("profile_image").setValue(uri12.toString());
+                                    binding.verifyAccount.setVisibility(View.VISIBLE);
+                                })
                                 .addOnFailureListener(e -> {
                                     Toast.makeText(getContext(), "Error : " + e.getMessage(), Toast.LENGTH_SHORT).show();
                                 });

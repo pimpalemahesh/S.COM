@@ -3,6 +3,7 @@ package com.myinnovation.socom.Adapter;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.myinnovation.socom.Model.Follow;
@@ -29,7 +31,7 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class UserAdapter extends RecyclerView.Adapter<UserAdapter.myviewholder> {
+public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.myviewholder> {
 
     ArrayList<UserClass> list;
     Context context;
@@ -37,7 +39,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.myviewholder> 
     View view;
     ViewGroup viewGroup;
 
-    public UserAdapter(ArrayList<UserClass> list, Context context, Activity activity) {
+    public SearchAdapter(ArrayList<UserClass> list, Context context, Activity activity) {
         this.list = list;
         this.context = context;
         this.activity = activity;
@@ -114,6 +116,33 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.myviewholder> 
                                             .child(user.getUserId())
                                             .child("followerCount")
                                             .setValue(user.getFollowerCount() + 1).addOnSuccessListener(unused1 -> {
+
+
+                                                DatabaseReference reference = FirebaseDatabase.getInstance().getReference()
+                                                        .child("Users");
+                                                reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                    @Override
+                                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                        if(snapshot.exists()){
+                                                            for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                                                                if(dataSnapshot.getKey().equals(follow.getFollowedBy())){
+                                                                    FirebaseDatabase.getInstance().getReference()
+                                                                            .child("Users")
+                                                                            .child(follow.getFollowedBy())
+                                                                            .child("friendCount")
+                                                                            .setValue(dataSnapshot.child("friendCount").getValue(Long.class) + 1);
+                                                                    break;
+                                                                }
+                                                            }
+                                                        }
+
+                                                    }
+
+                                                    @Override
+                                                    public void onCancelled(@NonNull DatabaseError error) {
+
+                                                    }
+                                                });
 
                                         holder.binding.followBtn.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.follow_active_btn));
                                         holder.binding.followBtn.setText("Following");

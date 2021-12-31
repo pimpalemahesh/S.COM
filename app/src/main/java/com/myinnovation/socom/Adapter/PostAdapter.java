@@ -35,6 +35,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.myviewholder> {
@@ -67,73 +68,73 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.myviewholder> 
         // Posted image.
         Post model = list.get(position);
 
-        long Timedef = System.currentTimeMillis() - model.getPostAt();
-        long hour = TimeUnit.MILLISECONDS.toMinutes(Timedef);
-
-        if(hour > 1){
-            Toast.makeText(context, "Inside method", Toast.LENGTH_LONG).show();
-            Uri imageUri = Uri.parse(model.getPostImage());
-
-            FirebaseDatabase.getInstance().getReference()
-                    .child("posts")
-                    .child(model.getPostId())
-                    .removeValue().addOnSuccessListener(unused -> {
-                        StorageReference photoRef = FirebaseStorage.getInstance().getReferenceFromUrl(String.valueOf(imageUri));
-                        photoRef.delete().addOnSuccessListener(unused12 -> {
-                            FirebaseDatabase.getInstance().getReference()
-                                    .child("notification")
-                                    .child(model.getPostBy())
-                                    .addValueEventListener(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                            for(DataSnapshot dataSnapshot : snapshot.getChildren()){
-                                                if(snapshot.exists() && (dataSnapshot.getKey() == model.getPostId())){
-
-                                                    FirebaseDatabase.getInstance().getReference()
-                                                            .child("notification")
-                                                            .child(model.getPostBy())
-                                                            .child(dataSnapshot.getKey())
-                                                            .addValueEventListener(new ValueEventListener() {
-                                                                @Override
-                                                                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                                                    if(snapshot.exists()){
-                                                                        for(DataSnapshot nof : snapshot.getChildren()){
-                                                                            if(nof.child("type").getValue(String.class).equals("comment")){
-                                                                                FirebaseDatabase.getInstance().getReference()
-                                                                                        .child("notification")
-                                                                                        .child(model.getPostBy())
-                                                                                        .child(dataSnapshot.getKey())
-                                                                                        .child(nof.getKey())
-                                                                                        .removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                                    @Override
-                                                                                    public void onSuccess(Void unused) {
-                                                                                        Toast.makeText(context, "Value removed", Toast.LENGTH_LONG).show();
-                                                                                    }
-                                                                                });
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                }
-
-                                                                @Override
-                                                                public void onCancelled(@NonNull DatabaseError error) {
-
-                                                                }
-                                                            });
-                                                }
-                                            }
-                                            notifyDataSetChanged();
-                                        }
-
-                                        @Override
-                                        public void onCancelled(@NonNull DatabaseError error) {
-
-                                        }
-                                    });
-                        });
-                    });
-
-        }
+//        long Timedef = System.currentTimeMillis() - model.getPostAt();
+//        long hour = TimeUnit.MILLISECONDS.toHours(Timedef);
+//
+//        if(hour > 168){
+//            Toast.makeText(context, "Inside method", Toast.LENGTH_LONG).show();
+//            Uri imageUri = Uri.parse(model.getPostImage());
+//
+//            FirebaseDatabase.getInstance().getReference()
+//                    .child("posts")
+//                    .child(model.getPostId())
+//                    .removeValue().addOnSuccessListener(unused -> {
+//                        StorageReference photoRef = FirebaseStorage.getInstance().getReferenceFromUrl(String.valueOf(imageUri));
+//                        photoRef.delete().addOnSuccessListener(unused12 -> {
+//                            FirebaseDatabase.getInstance().getReference()
+//                                    .child("notification")
+//                                    .child(model.getPostBy())
+//                                    .addValueEventListener(new ValueEventListener() {
+//                                        @Override
+//                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                                            for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+//                                                if(snapshot.exists() && (dataSnapshot.getKey() == model.getPostId())){
+//
+//                                                    FirebaseDatabase.getInstance().getReference()
+//                                                            .child("notification")
+//                                                            .child(model.getPostBy())
+//                                                            .child(dataSnapshot.getKey())
+//                                                            .addValueEventListener(new ValueEventListener() {
+//                                                                @Override
+//                                                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                                                                    if(snapshot.exists()){
+//                                                                        for(DataSnapshot nof : snapshot.getChildren()){
+//                                                                            if(nof.child("type").getValue(String.class).equals("comment")){
+//                                                                                FirebaseDatabase.getInstance().getReference()
+//                                                                                        .child("notification")
+//                                                                                        .child(model.getPostBy())
+//                                                                                        .child(dataSnapshot.getKey())
+//                                                                                        .child(nof.getKey())
+//                                                                                        .removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+//                                                                                    @Override
+//                                                                                    public void onSuccess(Void unused) {
+//                                                                                        Toast.makeText(context, "Value removed", Toast.LENGTH_LONG).show();
+//                                                                                    }
+//                                                                                });
+//                                                                            }
+//                                                                        }
+//                                                                    }
+//                                                                }
+//
+//                                                                @Override
+//                                                                public void onCancelled(@NonNull DatabaseError error) {
+//
+//                                                                }
+//                                                            });
+//                                                }
+//                                            }
+//                                            notifyDataSetChanged();
+//                                        }
+//
+//                                        @Override
+//                                        public void onCancelled(@NonNull DatabaseError error) {
+//
+//                                        }
+//                                    });
+//                        });
+//                    });
+//
+//        }
 
 
         Picasso.get()
@@ -150,6 +151,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.myviewholder> 
             holder.binding.postDescription.setVisibility(View.VISIBLE);
             holder.binding.postDescription.setText(model.getPostDescription());
         }
+
 
 
         // getting posted image detail from child Users and using model UserClass.

@@ -56,6 +56,10 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         UserClass user = snapshot.getValue(UserClass.class);
+
+
+
+
                         String text = TimeAgo.using(notification.getNotificationAt());
                         Picasso.get()
                                 .load(user.getProfile_image())
@@ -102,7 +106,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     context.startActivity(intent);
                 } else {
-                    
+
                 }
 
             }

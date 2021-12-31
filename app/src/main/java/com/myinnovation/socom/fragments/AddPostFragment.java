@@ -1,6 +1,7 @@
 package com.myinnovation.socom.fragments;
 
 import android.app.ProgressDialog;
+import android.app.appsearch.AppSearchResult;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -20,6 +21,7 @@ import android.widget.Toast;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
@@ -150,6 +152,33 @@ public class AddPostFragment extends Fragment {
                                         .push()
                                         .setValue(post).addOnSuccessListener(unused -> {
                                     progressDialog.dismiss();
+
+                                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference()
+                                            .child("Users");
+                                    databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                            if(snapshot.exists()){
+                                                for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                                                    if(dataSnapshot.getKey().equals(post.getPostBy())){
+                                                        FirebaseDatabase.getInstance().getReference()
+                                                                .child("Users")
+                                                                .child(post.getPostBy())
+                                                                .child("postCount")
+                                                                .setValue(dataSnapshot.child("postCount").getValue(Long.class) + 1);
+                                                        break;
+                                                    }
+                                                }
+                                            }
+
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError error) {
+
+                                        }
+                                    });
+
                                     Toast.makeText(getContext(), "Successfully Posted.", Toast.LENGTH_LONG).show();
                                 });
                             }))
@@ -171,7 +200,7 @@ public class AddPostFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == 103 && data.getData() != null) {
+        if (requestCode == 103  &&  data.getData() != null) {
             uri = data.getData();
             binding.postImage.setImageURI(uri);
             binding.postImage.setVisibility(View.VISIBLE);

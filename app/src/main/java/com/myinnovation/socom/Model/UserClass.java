@@ -4,7 +4,7 @@ public class UserClass {
 
     private String name, profession, email, password;
     private String coverPhoto, profile_image;
-    private int followerCount;
+    private int followerCount, postCount, friendCount;
     private String userId;
 
 
@@ -19,6 +19,22 @@ public class UserClass {
         this.password = password;
     }
 
+
+    public int getFriendCount() {
+        return friendCount;
+    }
+
+    public void setFriendCount(int friendCount) {
+        this.friendCount = friendCount;
+    }
+
+    public int getPostCount() {
+        return postCount;
+    }
+
+    public void setPostCount(int postCount) {
+        this.postCount = postCount;
+    }
 
     public String getUserId() {
         return userId;
