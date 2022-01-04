@@ -31,6 +31,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
+        binding.emailLogin.requestFocus();
         binding.gotosignup.setOnClickListener(view -> startActivity(new Intent(LoginActivity.this, SignUpActivity.class)));
 
         mAuth = FirebaseAuth.getInstance();

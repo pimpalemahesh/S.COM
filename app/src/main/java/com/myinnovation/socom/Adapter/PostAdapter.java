@@ -68,73 +68,60 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.myviewholder> 
         // Posted image.
         Post model = list.get(position);
 
-//        long Timedef = System.currentTimeMillis() - model.getPostAt();
-//        long hour = TimeUnit.MILLISECONDS.toHours(Timedef);
-//
-//        if(hour > 168){
-//            Toast.makeText(context, "Inside method", Toast.LENGTH_LONG).show();
-//            Uri imageUri = Uri.parse(model.getPostImage());
-//
-//            FirebaseDatabase.getInstance().getReference()
-//                    .child("posts")
-//                    .child(model.getPostId())
-//                    .removeValue().addOnSuccessListener(unused -> {
-//                        StorageReference photoRef = FirebaseStorage.getInstance().getReferenceFromUrl(String.valueOf(imageUri));
-//                        photoRef.delete().addOnSuccessListener(unused12 -> {
-//                            FirebaseDatabase.getInstance().getReference()
-//                                    .child("notification")
-//                                    .child(model.getPostBy())
-//                                    .addValueEventListener(new ValueEventListener() {
-//                                        @Override
-//                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                                            for(DataSnapshot dataSnapshot : snapshot.getChildren()){
-//                                                if(snapshot.exists() && (dataSnapshot.getKey() == model.getPostId())){
-//
-//                                                    FirebaseDatabase.getInstance().getReference()
-//                                                            .child("notification")
-//                                                            .child(model.getPostBy())
-//                                                            .child(dataSnapshot.getKey())
-//                                                            .addValueEventListener(new ValueEventListener() {
-//                                                                @Override
-//                                                                public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                                                                    if(snapshot.exists()){
-//                                                                        for(DataSnapshot nof : snapshot.getChildren()){
-//                                                                            if(nof.child("type").getValue(String.class).equals("comment")){
-//                                                                                FirebaseDatabase.getInstance().getReference()
-//                                                                                        .child("notification")
-//                                                                                        .child(model.getPostBy())
-//                                                                                        .child(dataSnapshot.getKey())
-//                                                                                        .child(nof.getKey())
-//                                                                                        .removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-//                                                                                    @Override
-//                                                                                    public void onSuccess(Void unused) {
-//                                                                                        Toast.makeText(context, "Value removed", Toast.LENGTH_LONG).show();
-//                                                                                    }
-//                                                                                });
-//                                                                            }
-//                                                                        }
-//                                                                    }
-//                                                                }
-//
-//                                                                @Override
-//                                                                public void onCancelled(@NonNull DatabaseError error) {
-//
-//                                                                }
-//                                                            });
-//                                                }
-//                                            }
-//                                            notifyDataSetChanged();
-//                                        }
-//
-//                                        @Override
-//                                        public void onCancelled(@NonNull DatabaseError error) {
-//
-//                                        }
-//                                    });
-//                        });
-//                    });
-//
-//        }
+        long Timedef = System.currentTimeMillis() - model.getPostAt();
+        long hour = TimeUnit.MILLISECONDS.toHours(Timedef);
+
+        if(hour > 168){
+            Toast.makeText(context, "Inside method", Toast.LENGTH_LONG).show();
+            Uri imageUri = Uri.parse(model.getPostImage());
+
+            FirebaseDatabase.getInstance().getReference()
+                    .child("posts")
+                    .child(model.getPostId())
+                    .removeValue().addOnSuccessListener(unused -> {
+                        StorageReference photoRef = FirebaseStorage.getInstance().getReferenceFromUrl(String.valueOf(imageUri));
+                        photoRef.delete().addOnSuccessListener(unused12 -> {
+                            DatabaseReference reference = FirebaseDatabase.getInstance().getReference()
+                                    .child("notification")
+                                    .child(model.getPostBy());
+
+                            reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                    if(snapshot.exists()){
+                                        for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                                            if(dataSnapshot.hasChild("postId")){
+                                                if(dataSnapshot.child("postId").getValue(String.class).equals(model.getPostId())){
+                                                    reference.child(dataSnapshot.getKey())
+                                                            .removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void unused) {
+                                                            Toast.makeText(context, "Value removed", Toast.LENGTH_LONG).show();
+                                                        }
+                                                    });
+                                                }
+                                                else{
+                                                    Toast.makeText(context, dataSnapshot.child("postId").getValue(String.class) + " + " + model.getPostId() , Toast.LENGTH_LONG).show();
+                                                }
+                                            }
+                                        }
+                                        notifyDataSetChanged();
+                                    }
+
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
+
+                                }
+                            });
+                        });
+                    });
+
+        }
+
+
+
 
 
         Picasso.get()

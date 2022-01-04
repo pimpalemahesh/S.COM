@@ -28,6 +28,8 @@ public class SignUpActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
+        binding.username.requestFocus();
+
         mAuth = FirebaseAuth.getInstance();
         mbase = FirebaseDatabase.getInstance();
 

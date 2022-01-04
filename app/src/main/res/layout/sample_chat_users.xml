@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:diagonal="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/followProfileImage"
+        android:layout_width="@dimen/_50mdp"
+        android:layout_height="@dimen/_50mdp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="4dp"
+        android:src="@drawable/avatar"
+        diagonal:civ_border_color="@color/white"
+        diagonal:civ_border_width="5dp"
+        diagonal:layout_constraintBottom_toBottomOf="parent"
+        diagonal:layout_constraintStart_toStartOf="parent"
+        diagonal:layout_constraintTop_toTopOf="parent"
+        diagonal:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:textColor="@color/black"
+        android:textSize="@dimen/_14font_mdp"
+        android:textStyle="bold"
+        diagonal:layout_constraintBottom_toTopOf="@+id/lastmsg"
+        diagonal:layout_constraintStart_toEndOf="@+id/followProfileImage"
+        diagonal:layout_constraintTop_toTopOf="@+id/followProfileImage"
+        diagonal:layout_constraintVertical_bias="0.38"
+        diagonal:layout_constraintVertical_chainStyle="packed" />
+
+    <TextView
+        android:id="@+id/lastmsg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        diagonal:layout_constraintBottom_toBottomOf="@+id/followProfileImage"
+        diagonal:layout_constraintStart_toStartOf="@+id/name"
+        diagonal:layout_constraintTop_toBottomOf="@+id/name" />
+
+    <TextView
+        android:id="@+id/time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        diagonal:layout_constraintBottom_toBottomOf="@+id/lastmsg"
+        diagonal:layout_constraintEnd_toEndOf="parent"
+        diagonal:layout_constraintStart_toEndOf="@+id/lastmsg"
+        diagonal:layout_constraintTop_toTopOf="@+id/lastmsg" />
+
+    <View
+        android:id="@+id/view"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:background="#C9B6B6B6"
+        diagonal:layout_constraintEnd_toEndOf="parent"
+        diagonal:layout_constraintStart_toStartOf="parent"
+        diagonal:layout_constraintTop_toBottomOf="@+id/followProfileImage" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

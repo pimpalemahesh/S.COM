@@ -5,7 +5,7 @@ public class UserClass {
     private String name, profession, email, password;
     private String coverPhoto, profile_image;
     private int followerCount, postCount, friendCount;
-    private String userId;
+    private String userId, token;
 
 
     public UserClass(){
@@ -22,6 +22,14 @@ public class UserClass {
 
     public int getFriendCount() {
         return friendCount;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 
     public void setFriendCount(int friendCount) {

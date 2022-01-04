@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
@@ -116,6 +117,35 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.myviewholder
 //
 //        }
 
+//        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference()
+//                .child(story.getStoryBy())
+//                .child("userStories");
+//
+//        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                if(snapshot.exists()){
+//                    Toast.makeText(context, snapshot.getKey() + "", Toast.LENGTH_LONG).show();
+//                    for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+//                        long time = dataSnapshot.child("storyAt").getValue(Long.class);
+//                        Toast.makeText(context, dataSnapshot.getKey() + "", Toast.LENGTH_LONG).show();
+//                        long tdef = System.currentTimeMillis() - time;
+//                        long minute = TimeUnit.MILLISECONDS.toMinutes(tdef);
+//                        if(minute > 10){
+//                            Toast.makeText(context, dataSnapshot.getKey() + "", Toast.LENGTH_LONG).show();
+//                        }
+//                    }
+//                }
+//                else{
+//                    Toast.makeText(context, "not exist", Toast.LENGTH_LONG).show();
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//        });
 
         if (story.getStories().size() > 0) {
             UserStories lastStory = story.getStories().get(story.getStories().size() - 1);

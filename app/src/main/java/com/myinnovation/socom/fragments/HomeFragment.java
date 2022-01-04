@@ -2,6 +2,7 @@ package com.myinnovation.socom.fragments;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -27,6 +28,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.myinnovation.socom.Activity.AllUsersChatActivity;
 import com.myinnovation.socom.Activity.CommentActivity;
 import com.myinnovation.socom.Adapter.PostAdapter;
 import com.myinnovation.socom.Adapter.StoryAdapter;
@@ -74,6 +76,8 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         binding = FragmentHomeBinding.inflate(inflater, container, false);
+
+
         binding.dashboardRv.showShimmerAdapter();
         binding.storyRV.showShimmerAdapter();
 
@@ -98,6 +102,13 @@ public class HomeFragment extends Fragment {
                                     .load(user.getProfile_image())
                                     .placeholder(R.drawable.ic_user)
                                     .into(binding.profileImage);
+
+                            binding.openChatSection.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    startActivity(new Intent(getContext(), AllUsersChatActivity.class).putExtra("username", user.getName()));
+                                }
+                            });
 
                             binding.profileImage.setOnClickListener(v -> {
                                 ViewGroup viewGroup = container;
