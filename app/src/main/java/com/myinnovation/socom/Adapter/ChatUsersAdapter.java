@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -25,9 +27,12 @@ import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
-public class ChatUsersAdapter extends RecyclerView.Adapter<ChatUsersAdapter.viewholder>{
+public class ChatUsersAdapter extends RecyclerView.Adapter<ChatUsersAdapter.viewholder> {
 
     ArrayList<UserClass> list;
     Activity activity;
@@ -102,17 +107,14 @@ public class ChatUsersAdapter extends RecyclerView.Adapter<ChatUsersAdapter.view
             builder.show();
         });
 
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(activity.getApplicationContext(), ChatActivity.class);
-                intent.putExtra("name", user.getName());
-                intent.putExtra("image", user.getProfile_image());
-                intent.putExtra("uid", user.getUserId());
-                intent.putExtra("token", user.getToken());
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                activity.getApplicationContext().startActivity(intent);
-            }
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(activity.getApplicationContext(), ChatActivity.class);
+            intent.putExtra("name", user.getName());
+            intent.putExtra("image", user.getProfile_image());
+            intent.putExtra("uid", user.getUserId());
+            intent.putExtra("token", user.getToken());
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            activity.getApplicationContext().startActivity(intent);
         });
     }
 

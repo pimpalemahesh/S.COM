@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.SearchView;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -34,10 +35,12 @@ import java.util.HashMap;
 public class AllUsersChatActivity extends AppCompatActivity {
 
     ActivityAllUsersChatBinding binding;
+    ChatUsersAdapter adapter;
 
     ArrayList<UserClass> list = new ArrayList<>();
     FirebaseAuth mAuth;
     FirebaseDatabase mbase;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +55,28 @@ public class AllUsersChatActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         mbase = FirebaseDatabase.getInstance();
         binding.chatUserRv.showShimmerAdapter();
+
+        adapter = new ChatUsersAdapter(list, AllUsersChatActivity.this);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        binding.chatUserRv.setLayoutManager(layoutManager);
+
+
+        if(binding.searchview != null){
+            binding.searchview.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    return false;
+                }
+
+                @Override
+                public boolean onQueryTextChange(String newText) {
+                    search(newText);
+                    return true;
+                }
+            });
+        }
+
+
 
         FirebaseMessaging.getInstance()
                 .getToken()
@@ -68,9 +93,7 @@ public class AllUsersChatActivity extends AppCompatActivity {
                     }
                 });
 
-        ChatUsersAdapter adapter = new ChatUsersAdapter(list, AllUsersChatActivity.this);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        binding.chatUserRv.setLayoutManager(layoutManager);
+
 
         binding.requests.setOnClickListener(v -> startActivity(new Intent(AllUsersChatActivity.this, RequestActivity.class)));
 
@@ -98,6 +121,20 @@ public class AllUsersChatActivity extends AppCompatActivity {
                 });
 
     }
+
+    private void search(String str) {
+        ArrayList<UserClass> arrayList = new ArrayList<>();
+        for(UserClass user : list){
+            if(user.getName().toLowerCase().contains(str.toLowerCase())){
+                arrayList.add(user);
+            }
+        }
+
+        ChatUsersAdapter ad = new ChatUsersAdapter(arrayList, AllUsersChatActivity.this);
+        binding.chatUserRv.setAdapter(ad);
+
+    }
+
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         finish();

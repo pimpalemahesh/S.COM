@@ -59,10 +59,7 @@ public class ChatActivity extends AppCompatActivity {
     FirebaseStorage storage;
 
     ProgressDialog dialog;
-    String senderUid;
-    String receiverUid;
-    String token;
-    String name;
+    String senderUid, receiverUid, name, profile, token;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,9 +79,9 @@ public class ChatActivity extends AppCompatActivity {
         messages = new ArrayList<>();
 
 
-        String name = getIntent().getStringExtra("name");
-        String profile = getIntent().getStringExtra("image");
-        String token = getIntent().getStringExtra("token");
+        name = getIntent().getStringExtra("name");
+        profile = getIntent().getStringExtra("image");
+        token = getIntent().getStringExtra("token");
 
         //Toast.makeText(this, token, Toast.LENGTH_SHORT).show();
 
@@ -239,19 +236,10 @@ public class ChatActivity extends AppCompatActivity {
             notificationData.put("to", token);
 
             JsonObjectRequest request = new JsonObjectRequest(url, notificationData
-                    , new Response.Listener<JSONObject>() {
+                    , response -> {
+                    }, error -> Toast.makeText(ChatActivity.this, error.getLocalizedMessage(), Toast.LENGTH_SHORT).show()) {
                 @Override
-                public void onResponse(JSONObject response) {
-                    // Toast.makeText(ChatActivity.this, "success", Toast.LENGTH_SHORT).show();
-                }
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    Toast.makeText(ChatActivity.this, error.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-                }
-            }) {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
+                public Map<String, String> getHeaders() {
                     HashMap<String, String> map = new HashMap<>();
                     String key = "Key=AAAAfGnalso:APA91bFM2gch_6tRGoxx-5cY-kz9pjIrEqCp90wAYUXuIJfdByGYtJNtDyCL85YLMH-zcDjOqXM79UYYtnGqpzNA5F50E1_lwoR0Ib308nFNBnxQhFQA96H34_bd7LLjStOUfhHwCjD8";
                     map.put("Content-Type", "application/json");
