@@ -31,10 +31,10 @@ public class SplashScreenActivity extends AppCompatActivity {
             if ((wifi != null & datac != null)
                     && (wifi.isConnected() | datac.isConnected())) {
                 finish();
-                startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+                startActivity(new Intent(getApplicationContext(), LoginActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
             }else{
                 finish();
-                startActivity(new Intent(getApplicationContext(), NoInternetActivity.class));
+                startActivity(new Intent(getApplicationContext(), NoInternetActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
             }
         }, 3000);
 

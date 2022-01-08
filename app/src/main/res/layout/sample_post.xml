@@ -25,14 +25,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <View
-        android:id="@+id/statusCircle"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="@drawable/orange_circle"
-        app:layout_constraintStart_toStartOf="@+id/post_profileImage"
-        app:layout_constraintTop_toTopOf="@+id/post_profileImage" />
-
     <TextView
         android:id="@+id/userName"
         android:layout_width="wrap_content"
@@ -54,11 +46,11 @@
         app:layout_constraintTop_toBottomOf="@+id/userName" />
 
     <ImageView
-        android:id="@+id/imageView2"
+        android:id="@+id/download"
         android:layout_width="@dimen/_18mdp"
         android:layout_height="@dimen/_18mdp"
         android:layout_marginEnd="8dp"
-        android:src="@drawable/ic_baseline_more_vert_24"
+        android:src="@drawable/ic_download"
         app:layout_constraintBottom_toBottomOf="@+id/post_profileImage"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/post_profileImage" />
@@ -76,15 +68,15 @@
         app:layout_constraintTop_toBottomOf="@+id/post_profileImage"
         app:riv_mutate_background="true" />
 
-    <ImageView
-        android:id="@+id/save"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:src="@drawable/ic_bookmark"
-        app:layout_constraintEnd_toEndOf="@+id/postImage"
-        app:layout_constraintTop_toTopOf="@+id/postImage" />
+<!--    <ImageView-->
+<!--        android:id="@+id/save"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginTop="16dp"-->
+<!--        android:layout_marginEnd="16dp"-->
+<!--        android:src="@drawable/ic_bookmark"-->
+<!--        app:layout_constraintEnd_toEndOf="@+id/postImage"-->
+<!--        app:layout_constraintTop_toTopOf="@+id/postImage" />-->
 
     <TextView
         android:id="@+id/like"

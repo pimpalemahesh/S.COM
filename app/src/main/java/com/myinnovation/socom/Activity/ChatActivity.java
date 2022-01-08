@@ -3,6 +3,7 @@ package com.myinnovation.socom.Activity;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.app.ProgressDialog;
@@ -10,20 +11,17 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.speech.RecognitionListener;
+import android.speech.RecognizerIntent;
+import android.speech.SpeechRecognizer;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -31,9 +29,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 import com.myinnovation.socom.Adapter.MessageAdapter;
 import com.myinnovation.socom.Model.Message;
+import com.myinnovation.socom.Model.Request;
 import com.myinnovation.socom.R;
 import com.myinnovation.socom.databinding.ActivityChatBinding;
 import com.squareup.picasso.Picasso;
@@ -60,6 +58,8 @@ public class ChatActivity extends AppCompatActivity {
 
     ProgressDialog dialog;
     String senderUid, receiverUid, name, profile, token;
+    SpeechRecognizer speechRecognizer;
+    int count = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,12 +91,7 @@ public class ChatActivity extends AppCompatActivity {
                 .placeholder(R.drawable.avatar)
                 .into(binding.profile);
 
-        binding.imageView2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        binding.imageView2.setOnClickListener(v -> finish());
 
         receiverUid = getIntent().getStringExtra("uid");
         senderUid = FirebaseAuth.getInstance().getUid();
@@ -106,7 +101,7 @@ public class ChatActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
                     String status = snapshot.getValue(String.class);
-                    if (!status.isEmpty()) {
+                    if (status != null && !status.isEmpty()) {
                         if (status.equals("Offline")) {
                             binding.status.setVisibility(View.GONE);
                         } else {
@@ -130,53 +125,192 @@ public class ChatActivity extends AppCompatActivity {
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(this));
         binding.recyclerView.setAdapter(adapter);
 
-        database.getReference().child("chats")
-                .child(senderRoom)
-                .child("messages")
-                .addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        messages.clear();
-                        for (DataSnapshot snapshot1 : snapshot.getChildren()) {
-                            Message message = snapshot1.getValue(Message.class);
-                            message.setMessageId(snapshot1.getKey());
-                            messages.add(message);
-                        }
+        speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
+        final Intent speechRecognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
 
-                        adapter.notifyDataSetChanged();
-                    }
+        binding.micbtn.setOnClickListener(v -> {
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
+                // count == 0 mic is off / count == 1 mic is on.
+                if(count == 0)
+                {
+                    // change mic image from off to on.
+                    binding.micbtn.setImageDrawable(AppCompatResources.getDrawable(this, R.drawable.ic_baseline_mic_24));
 
-                    }
-                });
+                    // startListening
+                    speechRecognizer.startListening(speechRecognizerIntent);
+                    count = 1;
+                }
+                else{
+                    // change mic image from on to off.
+                    binding.micbtn.setImageDrawable(AppCompatResources.getDrawable(this, R.drawable.ic_baseline_mic_off_24));
+
+                    // stopListening
+                    speechRecognizer.stopListening();
+                    count = 0;
+                }
+            });
+
+        speechRecognizer.setRecognitionListener(new RecognitionListener() {
+            @Override
+            public void onReadyForSpeech(Bundle params) {
+
+            }
+
+            @Override
+            public void onBeginningOfSpeech() {
+
+            }
+
+            @Override
+            public void onRmsChanged(float rmsdB) {
+
+            }
+
+            @Override
+            public void onBufferReceived(byte[] buffer) {
+
+            }
+
+            @Override
+            public void onEndOfSpeech() {
+
+            }
+
+            @Override
+            public void onError(int error) {
+
+            }
+
+            @Override
+            public void onResults(Bundle results) {
+                ArrayList<String> data = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+
+                binding.messageBox.setText(data.get(0));
+
+                String messageTxt = data.get(0);
+
+                Date date = new Date();
+                Message message = new Message(messageTxt, senderUid, date.getTime());
+
+
+                HashMap<String, Object> lastMsgObj = new HashMap<>();
+                lastMsgObj.put("lastMsg", message.getMessage());
+                lastMsgObj.put("lastMsgTime", date.getTime());
+
+                database.getReference().child("chats").child(senderRoom).updateChildren(lastMsgObj);
+                database.getReference().child("chats").child(receiverRoom).updateChildren(lastMsgObj);
+
+                database.getReference().child("chats")
+                        .child(senderRoom)
+                        .child("messages")
+                        .push()
+                        .setValue(message).addOnSuccessListener(aVoid -> database.getReference().child("chats")
+                        .child(receiverRoom)
+                        .push()
+                        .setValue(message).addOnSuccessListener(aVoid1 -> {
+                            binding.messageBox.setText("");
+                            binding.sendBtn.setVisibility(View.GONE);
+                            binding.micbtn.setVisibility(View.VISIBLE);
+                            sendNotification(name, message.getMessage(), token);
+                        }));
+            }
+
+            @Override
+            public void onPartialResults(Bundle partialResults) {
+
+            }
+
+            @Override
+            public void onEvent(int eventType, Bundle params) {
+
+            }
+        });
 
         binding.sendBtn.setOnClickListener(v -> {
-            String messageTxt = binding.messageBox.getText().toString();
+            Toast.makeText(getApplicationContext(), "send button clicked", Toast.LENGTH_LONG).show();
+            if(binding.messageBox.getText().toString().equals("") || binding.messageBox.getText().length() < 0){
+                Toast.makeText(getApplicationContext(), "Your message is Empty.", Toast.LENGTH_LONG).show();
+            } else{
+                database.getReference().child("chats").child(senderRoom)
+                        .child("Status")
+                        .addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                if(snapshot.exists()){
+                                    String status = snapshot.getValue(String.class);
+                                    if(status != null && status.equals("Accept")){
+                                        String messageTxt = binding.messageBox.getText().toString();
 
-            Date date = new Date();
-            Message message = new Message(messageTxt, senderUid, date.getTime());
-            binding.messageBox.setText("");
+                                        Date date = new Date();
+                                        Message message = new Message(messageTxt, senderUid, date.getTime());
+                                        binding.messageBox.setText("");
 
-            String randomKey = database.getReference().push().getKey();
 
-            HashMap<String, Object> lastMsgObj = new HashMap<>();
-            lastMsgObj.put("lastMsg", message.getMessage());
-            lastMsgObj.put("lastMsgTime", date.getTime());
+                                        HashMap<String, Object> lastMsgObj = new HashMap<>();
+                                        lastMsgObj.put("lastMsg", message.getMessage());
+                                        lastMsgObj.put("lastMsgTime", date.getTime());
 
-            database.getReference().child("chats").child(senderRoom).updateChildren(lastMsgObj);
-            database.getReference().child("chats").child(receiverRoom).updateChildren(lastMsgObj);
+                                        database.getReference().child("chats").child(senderRoom).updateChildren(lastMsgObj);
+                                        database.getReference().child("chats").child(receiverRoom).updateChildren(lastMsgObj);
 
-            database.getReference().child("chats")
-                    .child(senderRoom)
-                    .child("messages")
-                    .child(randomKey)
-                    .setValue(message).addOnSuccessListener(aVoid -> database.getReference().child("chats")
-                            .child(receiverRoom)
-                            .child("messages")
-                            .child(randomKey)
-                            .setValue(message).addOnSuccessListener(aVoid1 -> sendNotification(name, message.getMessage(), token)));
+                                        database.getReference().child("chats")
+                                                .child(senderRoom)
+                                                .child("messages")
+                                                .push()
+                                                .setValue(message).addOnSuccessListener(aVoid -> database.getReference().child("chats")
+                                                        .child(receiverRoom)
+                                                        .child("messages")
+                                                        .push()
+                                                        .setValue(message).addOnSuccessListener(aVoid1 -> {
+                                                }));
+                                    }
+                                } else{
+                                    String messageTxt = binding.messageBox.getText().toString();
+
+                                    Date date = new Date();
+                                    Message message = new Message(messageTxt, senderUid, date.getTime());
+                                    binding.messageBox.setText("");
+
+                                    HashMap<String, Object> lastMsgObj = new HashMap<>();
+                                    lastMsgObj.put("lastMsg", message.getMessage());
+                                    lastMsgObj.put("lastMsgTime", date.getTime());
+
+                                    database.getReference().child("chats").child(senderRoom).updateChildren(lastMsgObj);
+                                    database.getReference().child("chats").child(receiverRoom).updateChildren(lastMsgObj);
+
+                                    database.getReference().child("chats")
+                                            .child(senderRoom)
+                                            .child("messages")
+                                            .push()
+                                            .setValue(message).addOnSuccessListener(aVoid -> database.getReference().child("chats")
+                                                    .child(receiverRoom)
+                                                    .child("messages")
+                                                    .push()
+                                                    .setValue(message).addOnSuccessListener(aVoid1 -> {
+
+                                                Request request = new Request();
+                                                request.setRequestId(senderUid);
+                                                request.setRequestAt(new Date().getTime());
+                                                request.setRequestTo(receiverUid);
+
+                                                database.getReference().child("Requests")
+                                                        .child(senderRoom)
+                                                        .setValue(request).addOnSuccessListener(unused -> {
+                                                            binding.sendBtn.setVisibility(View.GONE);
+                                                            binding.micbtn.setVisibility(View.VISIBLE);
+                                                            sendNotification(name, message.getMessage(), token);
+                                                            Toast.makeText(getApplicationContext(), "Request sent successfully",Toast.LENGTH_LONG).show();
+                                                        });
+                                            }));
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
+            }
 
         });
 
@@ -191,12 +325,14 @@ public class ChatActivity extends AppCompatActivity {
         binding.messageBox.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
+                binding.micbtn.setVisibility(View.VISIBLE);
+                binding.micbtn.setImageDrawable(AppCompatResources.getDrawable(getApplicationContext(), R.drawable.ic_baseline_mic_off_24));
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-
+                binding.micbtn.setVisibility(View.GONE);
+                binding.sendBtn.setVisibility(View.VISIBLE);
             }
 
             @Override
@@ -204,12 +340,16 @@ public class ChatActivity extends AppCompatActivity {
                 database.getReference().child("presence").child(senderUid).setValue("typing...");
                 handler.removeCallbacksAndMessages(null);
                 handler.postDelayed(userStoppedTyping, 1000);
+                binding.sendBtn.setVisibility(View.VISIBLE);
+                binding.micbtn.setVisibility(View.GONE);
             }
 
-            Runnable userStoppedTyping = new Runnable() {
+            final Runnable userStoppedTyping = new Runnable() {
                 @Override
                 public void run() {
                     database.getReference().child("presence").child(senderUid).setValue("Online");
+                    binding.micbtn.setVisibility(View.GONE);
+                    binding.sendBtn.setVisibility(View.VISIBLE);
                 }
             };
         });
@@ -217,9 +357,6 @@ public class ChatActivity extends AppCompatActivity {
 
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-//        getSupportActionBar().setTitle(name);
-//
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     void sendNotification(String name, String message, String token) {
@@ -253,7 +390,7 @@ public class ChatActivity extends AppCompatActivity {
 
 
         } catch (Exception ex) {
-
+            Toast.makeText(this, "Notification Error : " + ex.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -282,8 +419,6 @@ public class ChatActivity extends AppCompatActivity {
                                 message.setImageUrl(filePath);
                                 binding.messageBox.setText("");
 
-                                String randomKey = database.getReference().push().getKey();
-
                                 HashMap<String, Object> lastMsgObj = new HashMap<>();
                                 lastMsgObj.put("lastMsg", message.getMessage());
                                 lastMsgObj.put("lastMsgTime", date.getTime());
@@ -294,11 +429,11 @@ public class ChatActivity extends AppCompatActivity {
                                 database.getReference().child("chats")
                                         .child(senderRoom)
                                         .child("messages")
-                                        .child(randomKey)
+                                        .push()
                                         .setValue(message).addOnSuccessListener(aVoid -> database.getReference().child("chats")
                                                 .child(receiverRoom)
                                                 .child("messages")
-                                                .child(randomKey)
+                                                .push()
                                                 .setValue(message).addOnSuccessListener(aVoid1 -> {
 
                                                 }));
@@ -307,6 +442,90 @@ public class ChatActivity extends AppCompatActivity {
                     });
                 }
             }
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        FirebaseDatabase.getInstance().getReference().child("chats").child(senderRoom)
+                .child("Status")
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if(snapshot.exists()){
+                            String status = snapshot.getValue(String.class);
+                            Toast.makeText(getApplicationContext(), "Status = "+status, Toast.LENGTH_LONG).show();
+                            if(status != null && status.equals("Accept")){
+                                database.getReference().child("chats")
+                                        .child(senderRoom)
+                                        .child("messages")
+                                        .addValueEventListener(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                messages.clear();
+                                                for (DataSnapshot snapshot1 : snapshot.getChildren()) {
+                                                    Message message = snapshot1.getValue(Message.class);
+                                                    message.setMessageId(snapshot1.getKey());
+                                                    messages.add(message);
+                                                }
+
+                                                adapter.notifyDataSetChanged();
+                                            }
+
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError error) {
+
+                                            }
+                                        });
+                            }
+                        } else{
+                            database.getReference().child("chats")
+                                    .child(senderRoom)
+                                    .child("messages")
+                                    .addValueEventListener(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                            messages.clear();
+                                            for (DataSnapshot snapshot1 : snapshot.getChildren()) {
+                                                Message message = snapshot1.getValue(Message.class);
+                                                message.setMessageId(snapshot1.getKey());
+                                                messages.add(message);
+                                            }
+
+                                            adapter.notifyDataSetChanged();
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError error) {
+
+                                        }
+                                    });
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        String currentId = FirebaseAuth.getInstance().getUid();
+        if (currentId != null) {
+            database.getReference().child("presence").child(currentId).setValue("Online");
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        String currentId = FirebaseAuth.getInstance().getUid();
+        if (currentId != null) {
+            database.getReference().child("presence").child(currentId).setValue("Offline");
         }
     }
 }

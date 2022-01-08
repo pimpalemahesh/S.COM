@@ -43,6 +43,7 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.myviewholder
     View view;
     ViewGroup viewGroup;
     Activity activity;
+    DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
 
     public StoryAdapter(ArrayList<Story> list, Context context, Activity activity) {
         this.list = list;
@@ -156,7 +157,30 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.myviewholder
 
             holder.binding.statusCircle.setPortionsCount(story.getStories().size());
 
-            FirebaseDatabase.getInstance().getReference()
+            // if user is live then set visibility of image Visible
+            reference.child("presence").child(story.getStoryBy()).addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (snapshot.exists()) {
+                        String status = snapshot.getValue(String.class);
+                        if (!status.isEmpty()) {
+                            if (status.equals("Offline")) {
+                                holder.binding.live.setVisibility(View.GONE);
+                            } else {
+                                holder.binding.live.setVisibility(View.VISIBLE);
+                            }
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+
+
+            reference
                     .child("Users")
                     .child(story.getStoryBy()).addValueEventListener(new ValueEventListener() {
                 @Override

@@ -103,12 +103,7 @@ public class HomeFragment extends Fragment {
                                     .placeholder(R.drawable.ic_user)
                                     .into(binding.profileImage);
 
-                            binding.openChatSection.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    startActivity(new Intent(getContext(), AllUsersChatActivity.class).putExtra("username", user.getName()));
-                                }
-                            });
+                            binding.openChatSection.setOnClickListener(v -> startActivity(new Intent(getContext(), AllUsersChatActivity.class).putExtra("username", user.getName())));
 
                             binding.profileImage.setOnClickListener(v -> {
                                 ViewGroup viewGroup = container;
@@ -244,5 +239,19 @@ public class HomeFragment extends Fragment {
 
         });
         return binding.getRoot();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        String currentId = FirebaseAuth.getInstance().getUid();
+        mbase.getReference().child("presence").child(currentId).setValue("Online");
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        String currentId = FirebaseAuth.getInstance().getUid();
+        mbase.getReference().child("presence").child(currentId).setValue("Offline");
     }
 }

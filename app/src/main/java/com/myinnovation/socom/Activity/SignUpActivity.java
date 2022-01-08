@@ -33,7 +33,7 @@ public class SignUpActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         mbase = FirebaseDatabase.getInstance();
 
-        binding.gotosignin.setOnClickListener(view -> startActivity(new Intent(SignUpActivity.this, LoginActivity.class)));
+        binding.gotosignin.setOnClickListener(view -> startActivity(new Intent(SignUpActivity.this, LoginActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)));
         binding.signup.setOnClickListener(view -> {
             binding.bar.setVisibility(View.VISIBLE);
 
@@ -50,7 +50,7 @@ public class SignUpActivity extends AppCompatActivity {
                                 mbase.getReference().child("Users").child(id).setValue(user);
 
                                 Toast.makeText(getApplicationContext(), "Successfully Registered.", Toast.LENGTH_LONG).show();
-                                startActivity(new Intent(SignUpActivity.this, MainActivity.class));
+                                startActivity(new Intent(SignUpActivity.this, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
                             } else {
                                 Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_LONG).show();
                             }

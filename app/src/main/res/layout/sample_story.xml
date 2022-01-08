@@ -44,7 +44,7 @@
         app:layout_constraintTop_toTopOf="@+id/profileImage" />
 
     <ImageView
-        android:id="@+id/storyType"
+        android:id="@+id/live"
         android:layout_width="30dp"
         android:layout_height="20dp"
         android:layout_marginTop="4dp"

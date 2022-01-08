@@ -31,7 +31,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
-public class ProfileFragment extends Fragment {
+public class  ProfileFragment extends Fragment {
 
     FragmentProfileBinding binding;
 

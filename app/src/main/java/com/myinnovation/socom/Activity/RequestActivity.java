@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -14,6 +15,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.myinnovation.socom.Adapter.RequestAdapter;
+import com.myinnovation.socom.Model.Request;
 import com.myinnovation.socom.Model.UserClass;
 import com.myinnovation.socom.databinding.ActivityRequestBinding;
 
@@ -38,42 +40,46 @@ public class RequestActivity extends AppCompatActivity {
         adapter = new RequestAdapter(list, RequestActivity.this);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         binding.requestRv.setLayoutManager(layoutManager);
+        binding.requestRv.showShimmerAdapter();
 
         setSupportActionBar(binding.requestToolbar);
         RequestActivity.this.setTitle("Request Messages");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        databaseReference.child("Users")
+        FirebaseDatabase.getInstance().getReference().child("Requests")
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        list.clear();
-                        for(DataSnapshot dataSnapshot: snapshot.getChildren()){
-                            UserClass user = dataSnapshot.getValue(UserClass.class);
-                            user.setUserId(dataSnapshot.getKey());
-
-                            databaseReference.child("Request")
-                                    .child(firebaseAuth.getUid())
-                                    .addValueEventListener(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                            if(snapshot.exists()){
-                                                for(DataSnapshot dataSnapshot1 : snapshot.getChildren()){
-                                                    if(dataSnapshot.getKey().equals(dataSnapshot1.getKey())){
-                                                        list.add(user);
+                        if(snapshot.exists()){
+                            for(DataSnapshot dataSnapshot: snapshot.getChildren()){
+                                Request request = dataSnapshot.getValue(Request.class);
+                                FirebaseDatabase.getInstance().getReference().child("Users")
+                                        .addValueEventListener(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                if(snapshot.exists()){
+                                                    list.clear();
+                                                    for(DataSnapshot snapshot1: snapshot.getChildren()){
+                                                        UserClass user = snapshot1.getValue(UserClass.class);
+                                                        user.setUserId(request.getRequestId());
+                                                        if(request.getRequestId().equals(snapshot1.getKey())){
+                                                            if (!request.getRequestId().equals(FirebaseAuth.getInstance().getUid())) {
+                                                                list.add(user);
+                                                            }
+                                                            binding.requestRv.setAdapter(adapter);
+                                                            binding.requestRv.hideShimmerAdapter();
+                                                            adapter.notifyDataSetChanged();
+                                                        }
                                                     }
                                                 }
-                                                binding.requestRv.setAdapter(adapter);
-                                                binding.requestRv.hideShimmerAdapter();
-                                                adapter.notifyDataSetChanged();
                                             }
-                                        }
 
-                                        @Override
-                                        public void onCancelled(@NonNull DatabaseError error) {
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError error) {
 
-                                        }
-                                    });
+                                            }
+                                        });
+                            }
                         }
                     }
 
@@ -82,11 +88,18 @@ public class RequestActivity extends AppCompatActivity {
 
                     }
                 });
+
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         finish();
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        adapter.notifyDataSetChanged();
     }
 }

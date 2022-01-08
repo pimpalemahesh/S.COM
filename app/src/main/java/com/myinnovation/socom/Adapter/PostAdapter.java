@@ -1,9 +1,8 @@
 package com.myinnovation.socom.Adapter;
 
-import static com.google.firebase.storage.FirebaseStorage.*;
-
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -29,13 +28,12 @@ import com.myinnovation.socom.Model.Notification;
 import com.myinnovation.socom.Model.Post;
 import com.myinnovation.socom.Model.UserClass;
 import com.myinnovation.socom.R;
-import com.myinnovation.socom.databinding.SampleDashboardBinding;
+import com.myinnovation.socom.databinding.SamplePostBinding;
 import com.myinnovation.socom.databinding.SampleViewUserDataBinding;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.myviewholder> {
@@ -58,7 +56,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.myviewholder> 
 
         viewGroup = parent;
 
-        View view = LayoutInflater.from(context).inflate(R.layout.sample_dashboard, parent, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.sample_post, parent, false);
         return new myviewholder(view);
     }
 
@@ -67,6 +65,13 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.myviewholder> 
 
         // Posted image.
         Post model = list.get(position);
+
+        holder.binding.download.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DownloadPost(model.getPostImage());
+            }
+        });
 
         long Timedef = System.currentTimeMillis() - model.getPostAt();
         long hour = TimeUnit.MILLISECONDS.toHours(Timedef);
@@ -242,6 +247,15 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.myviewholder> 
 
     }
 
+    private void DownloadPost(String imageUri) {
+        Uri uri = Uri.parse(imageUri);
+        DownloadManager downloadManager = (DownloadManager) activity.getApplicationContext().getSystemService(Context.DOWNLOAD_SERVICE);
+        DownloadManager.Request request = new DownloadManager.Request(uri);
+        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+        request.setDestinationInExternalFilesDir(activity.getApplicationContext(), "Mobile", "SCOM/s.com."+System.currentTimeMillis());
+        downloadManager.enqueue(request);
+    }
+
     @Override
     public int getItemCount() {
         return list.size();
@@ -249,12 +263,12 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.myviewholder> 
 
     class myviewholder extends RecyclerView.ViewHolder {
 
-        SampleDashboardBinding binding;
+        SamplePostBinding binding;
 
         public myviewholder(@NonNull View itemView) {
             super(itemView);
 
-            binding = SampleDashboardBinding.bind(itemView);
+            binding = SamplePostBinding.bind(itemView);
         }
     }
 }

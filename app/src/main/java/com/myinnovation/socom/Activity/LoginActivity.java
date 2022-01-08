@@ -32,7 +32,7 @@ public class LoginActivity extends AppCompatActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         binding.emailLogin.requestFocus();
-        binding.gotosignup.setOnClickListener(view -> startActivity(new Intent(LoginActivity.this, SignUpActivity.class)));
+        binding.gotosignup.setOnClickListener(view -> startActivity(new Intent(LoginActivity.this, SignUpActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)));
 
         mAuth = FirebaseAuth.getInstance();
         currentuser = mAuth.getCurrentUser();
@@ -48,7 +48,7 @@ public class LoginActivity extends AppCompatActivity {
                         .addOnCompleteListener(task -> {
                             if (task.isSuccessful()) {
                                 binding.bar.setVisibility(View.INVISIBLE);
-                                startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                                startActivity(new Intent(LoginActivity.this, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
                             }
                         })
                         .addOnFailureListener(e -> {

@@ -32,7 +32,7 @@ public class NoInternetActivity extends AppCompatActivity {
                     .getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
             if ((wifi != null & datac != null)
                     && (wifi.isConnected() | datac.isConnected())) {
-                startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+                startActivity(new Intent(getApplicationContext(), LoginActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
             }else{
                 Toast.makeText(getApplicationContext(), "No Internet Connection!", Toast.LENGTH_LONG).show();
             }
