@@ -30,6 +30,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Objects;
 
 public class CommentActivity extends AppCompatActivity {
 
@@ -49,7 +50,7 @@ public class CommentActivity extends AppCompatActivity {
 
         setSupportActionBar(binding.toolbar2);
         CommentActivity.this.setTitle("Comments");
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
 
         mAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
@@ -65,14 +66,16 @@ public class CommentActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 Post post = snapshot.getValue(Post.class);
-                Picasso.get()
-                        .load(post.getPostImage())
-                        .placeholder(R.drawable.ic_image)
-                        .into(binding.postImage);
+                if (post != null) {
+                    Picasso.get()
+                            .load(post.getPostImage())
+                            .placeholder(R.drawable.ic_image)
+                            .into(binding.postImage);
 
-                binding.description.setText(post.getPostDescription());
-                binding.like.setText(post.getPostLike() + "");
-                binding.comment.setText(post.getCommentCount() + "");
+                    binding.description.setText(post.getPostDescription());
+                    binding.like.setText(String.valueOf(post.getPostLike()));
+                    binding.comment.setText(String.valueOf(post.getCommentCount()));
+                }
             }
 
             @Override
@@ -88,13 +91,14 @@ public class CommentActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 UserClass user = snapshot.getValue(UserClass.class);
-                Picasso.get()
-                        .load(user.getProfile_image())
-                        .placeholder(R.drawable.ic_user)
-                        .into(binding.profileImage);
+                if (user != null && user.getName() != null) {
+                    Picasso.get()
+                            .load(user.getProfile_image())
+                            .placeholder(R.drawable.ic_user)
+                            .into(binding.profileImage);
 
-                binding.name.setText(user.getName());
-
+                    binding.name.setText(user.getName());
+                }
                 binding.profileImage.setOnClickListener(v -> {
                     ViewGroup viewGroup = findViewById(R.id.commentActivity);
                     View view = LayoutInflater.from(getApplicationContext()).inflate(R.layout.sample_view_user_data, viewGroup, false);

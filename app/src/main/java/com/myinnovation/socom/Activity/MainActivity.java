@@ -16,8 +16,6 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.myinnovation.socom.R;
 import com.myinnovation.socom.fragments.AddPostFragment;
 import com.myinnovation.socom.fragments.HomeFragment;
@@ -32,8 +30,12 @@ public class MainActivity extends AppCompatActivity {
     private Toast backToast;
     ActivityMainBinding binding;
 
+    private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
+    // Requesting permission to RECORD_AUDIO
+    private boolean permissionToRecordAccepted = false;
+    private final String [] permissions = {Manifest.permission.RECORD_AUDIO};
+
     FirebaseAuth mAuth = FirebaseAuth.getInstance();
-    DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,13 +45,6 @@ public class MainActivity extends AppCompatActivity {
 
         setSupportActionBar(binding.toolbar);
         MainActivity.this.setTitle("My Profile");
-
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED)
-        {
-            // If permission denied then we request again for permission.
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO},1);
-
-        }
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         binding.toolbar.setVisibility(View.GONE);
@@ -103,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.setting:
                 mAuth.signOut();
-                startActivity(new Intent(MainActivity.this, LoginActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+                startActivity(new Intent(MainActivity.this, LoginActivity.class));
         }
         return super.onOptionsItemSelected(item);
     }
@@ -125,12 +120,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == 1) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "Permission Granted.", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(this, "Permission Denied.", Toast.LENGTH_SHORT).show();
-            }
+        switch (requestCode){
+            case REQUEST_RECORD_AUDIO_PERMISSION:
+                permissionToRecordAccepted  = grantResults[0] == PackageManager.PERMISSION_GRANTED;
+                break;
         }
+        if (!permissionToRecordAccepted ) finish();
+
     }
 }

@@ -6,7 +6,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -20,6 +19,7 @@ import com.myinnovation.socom.Model.UserClass;
 import com.myinnovation.socom.databinding.ActivityRequestBinding;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class RequestActivity extends AppCompatActivity {
 
@@ -44,7 +44,7 @@ public class RequestActivity extends AppCompatActivity {
 
         setSupportActionBar(binding.requestToolbar);
         RequestActivity.this.setTitle("Request Messages");
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
 
         FirebaseDatabase.getInstance().getReference().child("Requests")
                 .addValueEventListener(new ValueEventListener() {
@@ -61,14 +61,16 @@ public class RequestActivity extends AppCompatActivity {
                                                     list.clear();
                                                     for(DataSnapshot snapshot1: snapshot.getChildren()){
                                                         UserClass user = snapshot1.getValue(UserClass.class);
-                                                        user.setUserId(request.getRequestId());
-                                                        if(request.getRequestId().equals(snapshot1.getKey())){
-                                                            if (!request.getRequestId().equals(FirebaseAuth.getInstance().getUid())) {
-                                                                list.add(user);
+                                                        if (request != null && user != null && request.getRequestId() != null) {
+                                                            user.setUserId(request.getRequestId());
+                                                            if (request.getRequestId().equals(snapshot1.getKey())) {
+                                                                if (!request.getRequestId().equals(FirebaseAuth.getInstance().getUid())) {
+                                                                    list.add(user);
+                                                                }
+                                                                binding.requestRv.setAdapter(adapter);
+                                                                binding.requestRv.hideShimmerAdapter();
+                                                                adapter.notifyDataSetChanged();
                                                             }
-                                                            binding.requestRv.setAdapter(adapter);
-                                                            binding.requestRv.hideShimmerAdapter();
-                                                            adapter.notifyDataSetChanged();
                                                         }
                                                     }
                                                 }

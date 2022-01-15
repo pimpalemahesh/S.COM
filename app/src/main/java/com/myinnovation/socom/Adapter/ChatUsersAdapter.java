@@ -2,13 +2,10 @@ package com.myinnovation.socom.Adapter;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Filter;
-import android.widget.Filterable;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -27,10 +24,8 @@ import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
-import java.util.List;
-import java.util.Locale;
+import java.util.Objects;
 
 public class ChatUsersAdapter extends RecyclerView.Adapter<ChatUsersAdapter.viewholder> {
 
@@ -66,13 +61,20 @@ public class ChatUsersAdapter extends RecyclerView.Adapter<ChatUsersAdapter.view
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if(snapshot.exists()) {
-                            String lastMsg = snapshot.child("lastMsg").getValue(String.class);
-                            long time = snapshot.child("lastMsgTime").getValue(Long.class);
-                            SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm a");
-                            holder.binding.time.setText(dateFormat.format(new Date(time)));
-                            holder.binding.lastmsg.setText(lastMsg);
+                            if(Objects.equals(snapshot.child("Status").getValue(String.class), "Accept")){
+                                String lastMsg = snapshot.child("lastMsg").getValue(String.class);
+                                if(snapshot.child("lastMsgTime").getValue(Long.class) != null){
+                                    long time = snapshot.child("lastMsgTime").getValue(Long.class);
+                                    SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm a");
+                                    holder.binding.time.setText(dateFormat.format(new Date(time)));
+                                    holder.binding.lastmsg.setText(lastMsg);
+                                }
+                            } else{
+                                holder.binding.lastmsg.setText(R.string.tap_to_chat);
+                            }
+
                         } else {
-                            holder.binding.lastmsg.setText("Tap to chat");
+                            holder.binding.lastmsg.setText(R.string.tap_to_chat);
                         }
                     }
 
@@ -123,7 +125,7 @@ public class ChatUsersAdapter extends RecyclerView.Adapter<ChatUsersAdapter.view
         return list.size();
     }
 
-    public class viewholder extends RecyclerView.ViewHolder{
+    public static class viewholder extends RecyclerView.ViewHolder{
 
         SampleChatUsersBinding binding;
         public viewholder(@NonNull View itemView) {

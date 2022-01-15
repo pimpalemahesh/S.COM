@@ -20,6 +20,7 @@ import com.myinnovation.socom.Model.Notification;
 import com.myinnovation.socom.databinding.FragmentNotificationBinding;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class NotificationFragment extends Fragment {
 
@@ -41,7 +42,7 @@ public class NotificationFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         binding = FragmentNotificationBinding.inflate(inflater, container, false);
         binding.notificationRV.showShimmerAdapter();
@@ -55,15 +56,17 @@ public class NotificationFragment extends Fragment {
 
         database.getReference()
                 .child("notification")
-                .child(FirebaseAuth.getInstance().getUid())
+                .child(Objects.requireNonNull(FirebaseAuth.getInstance().getUid()))
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         list.clear();
                         for(DataSnapshot dataSnapshot : snapshot.getChildren()){
                             Notification notification = dataSnapshot.getValue(Notification.class);
-                            notification.setNotificationId(dataSnapshot.getKey());
-                            list.add(notification);
+                            if (notification != null) {
+                                notification.setNotificationId(dataSnapshot.getKey());
+                                list.add(notification);
+                            }
                         }
                         binding.notificationRV.setAdapter(adapter);
                         binding.notificationRV.hideShimmerAdapter();

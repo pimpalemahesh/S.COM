@@ -20,6 +20,7 @@ import com.myinnovation.socom.Model.UserClass;
 import com.myinnovation.socom.databinding.FragmentSearchBinding;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class SearchFragment extends Fragment {
 
@@ -44,7 +45,7 @@ public class SearchFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         binding = FragmentSearchBinding.inflate(inflater, container, false);
@@ -61,9 +62,11 @@ public class SearchFragment extends Fragment {
                         list.clear();
                         for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                             UserClass user = dataSnapshot.getValue(UserClass.class);
-                            user.setUserId(dataSnapshot.getKey());
-                            if (!dataSnapshot.getKey().equals(FirebaseAuth.getInstance().getUid())) {
-                                list.add(user);
+                            if(user != null){
+                                user.setUserId(dataSnapshot.getKey());
+                                if (!Objects.requireNonNull(dataSnapshot.getKey()).equals(FirebaseAuth.getInstance().getUid())) {
+                                    list.add(user);
+                                }
                             }
                             binding.userRv.setAdapter(adapter);
                             binding.userRv.hideShimmerAdapter();

@@ -18,6 +18,7 @@ import android.widget.Toast;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
@@ -36,10 +37,9 @@ public class  ProfileFragment extends Fragment {
     FragmentProfileBinding binding;
 
     ArrayList<Follow> list;
-    FirebaseAuth mAuth;
+    String currentUid;
     FirebaseStorage storage;
-    FirebaseDatabase mbase;
-    int fd;
+    DatabaseReference reference;
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -50,14 +50,16 @@ public class  ProfileFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
-        mAuth = FirebaseAuth.getInstance();
+        if(FirebaseAuth.getInstance().getUid() != null){
+            currentUid = FirebaseAuth.getInstance().getUid();
+        }
         storage = FirebaseStorage.getInstance();
-        mbase = FirebaseDatabase.getInstance();
+        reference = FirebaseDatabase.getInstance().getReference();
 
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         binding = FragmentProfileBinding.inflate(inflater, container, false);
@@ -70,17 +72,17 @@ public class  ProfileFragment extends Fragment {
 
 
         // setting followrs count
-        mbase.getReference().child("Users")
-                .child(mAuth.getUid())
+        reference
+                .child("Users")
+                .child(currentUid)
                 .child("followers").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     Follow follow = dataSnapshot.getValue(Follow.class);
-                    if(follow.getFollowedBy().equals(mAuth.getUid())){
-                        Toast.makeText(getContext(), "I Got", Toast.LENGTH_LONG).show();
+                    if (follow != null && follow.getFollowedBy().equals(currentUid)) {
+                        list.add(follow);
                     }
-                    list.add(follow);
                 }
                 binding.friendRv.setAdapter(adapter);
                 binding.friendRv.hideShimmerAdapter();
@@ -96,35 +98,38 @@ public class  ProfileFragment extends Fragment {
 
         // setting cover photo image and profile using Picasso library
         // name profession followers also
-        mbase.getReference().child("Users").child(mAuth.getUid())
+        reference.child("Users")
+                .child(currentUid)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if (snapshot.exists()) {
                             UserClass user = snapshot.getValue(UserClass.class);
-                            Picasso.get()
-                                    .load(user.getCoverPhoto())
-                                    .placeholder(R.drawable.ic_image)
-                                    .into(binding.coverphoto);
+                            if(user != null){
+                                Picasso.get()
+                                        .load(user.getCoverPhoto())
+                                        .placeholder(R.drawable.ic_image)
+                                        .into(binding.coverphoto);
 
-                            Picasso.get()
-                                    .load(user.getProfile_image())
-                                    .placeholder(R.drawable.ic_user)
-                                    .into(binding.profileImage);
+                                Picasso.get()
+                                        .load(user.getProfile_image())
+                                        .placeholder(R.drawable.ic_user)
+                                        .into(binding.profileImage);
 
-                            if(snapshot.child("profile_image").exists()){
-                                binding.verifyAccount.setVisibility(View.VISIBLE);
-                            } else{
-                                binding.verifyAccount.setVisibility(View.GONE);
+                                if(snapshot.child("profile_image").exists()){
+                                    binding.verifyAccount.setVisibility(View.VISIBLE);
+                                } else{
+                                    binding.verifyAccount.setVisibility(View.GONE);
+                                }
+
+                                binding.UserName.setText(user.getName());
+                                binding.Profession.setText(user.getProfession());
+                                binding.followers.setText(String.valueOf(user.getFollowerCount()));
+                                binding.friend.setText(String.valueOf(user.getFriendCount()));
+                                binding.posts.setText(String.valueOf(user.getPostCount()));
+
+
                             }
-
-                            binding.UserName.setText(user.getName());
-                            binding.Profession.setText(user.getProfession());
-                            binding.followers.setText(user.getFollowerCount() + "");
-                            binding.friend.setText(user.getFriendCount() + "");
-                            binding.posts.setText(user.getPostCount() + "");
-
-
                         }
                     }
 
@@ -160,16 +165,16 @@ public class  ProfileFragment extends Fragment {
 
         ProgressDialog pd = new ProgressDialog(getContext());
         pd.setTitle("File Uploading");
-        pd.setProgressStyle(pd.STYLE_SPINNER);
+        pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         pd.setMessage("Uploaded : ");
         pd.setCancelable(false);
         pd.setCanceledOnTouchOutside(false);
 
-        if (requestCode == 101 && data.getData() != null) {
+        if (data != null && requestCode == 101 && data.getData() != null) {
             Uri uri = data.getData();
             binding.coverphoto.setImageURI(uri);
 
-            final StorageReference storageReference = storage.getReference().child("cover_photo").child(FirebaseAuth.getInstance().getUid());
+            final StorageReference storageReference = storage.getReference().child("cover_photo").child(currentUid);
 
             storageReference.putFile(uri)
                     .addOnSuccessListener(taskSnapshot -> {
@@ -177,7 +182,10 @@ public class  ProfileFragment extends Fragment {
                         Toast.makeText(getContext(), "Cover Photo saved.", Toast.LENGTH_LONG).show();
 
                         storageReference.getDownloadUrl()
-                                .addOnSuccessListener(uri1 -> mbase.getReference().child("Users").child(mAuth.getUid()).child("coverPhoto").setValue(uri1.toString()))
+                                .addOnSuccessListener(uri1 -> reference
+                                        .child("Users")
+                                        .child(currentUid)
+                                        .child("coverPhoto").setValue(uri1.toString()))
                                 .addOnFailureListener(e -> Toast.makeText(getContext(), "Error : " + e.getMessage(), Toast.LENGTH_SHORT).show());
                     })
                     .addOnProgressListener(snapshot -> {
@@ -187,11 +195,11 @@ public class  ProfileFragment extends Fragment {
                     });
         }
 
-        if (requestCode == 102 && data.getData() != null) {
+        if (data != null && requestCode == 102 && data.getData() != null) {
             Uri uri = data.getData();
             binding.profileImage.setImageURI(uri);
 
-            final StorageReference storageReference = storage.getReference().child("profile_image").child(FirebaseAuth.getInstance().getUid());
+            final StorageReference storageReference = storage.getReference().child("profile_image").child(currentUid);
 
             storageReference.putFile(uri)
                     .addOnSuccessListener(taskSnapshot -> {
@@ -200,12 +208,10 @@ public class  ProfileFragment extends Fragment {
 
                         storageReference.getDownloadUrl()
                                 .addOnSuccessListener(uri12 -> {
-                                    mbase.getReference().child("Users").child(mAuth.getUid()).child("profile_image").setValue(uri12.toString());
+                                    reference.child("Users").child(currentUid).child("profile_image").setValue(uri12.toString());
                                     binding.verifyAccount.setVisibility(View.VISIBLE);
                                 })
-                                .addOnFailureListener(e -> {
-                                    Toast.makeText(getContext(), "Error : " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                                });
+                                .addOnFailureListener(e -> Toast.makeText(getContext(), "Error : " + e.getMessage(), Toast.LENGTH_SHORT).show());
                     })
                     .addOnProgressListener(snapshot -> {
                         int per = (int) ((100 * snapshot.getBytesTransferred()) / snapshot.getTotalByteCount());

@@ -14,7 +14,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -34,6 +33,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.myviewholder> {
@@ -66,12 +66,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.myviewholder> 
         // Posted image.
         Post model = list.get(position);
 
-        holder.binding.download.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                DownloadPost(model.getPostImage());
-            }
-        });
+        holder.binding.download.setOnClickListener(v -> DownloadPost(model.getPostImage()));
 
         long Timedef = System.currentTimeMillis() - model.getPostAt();
         long hour = TimeUnit.MILLISECONDS.toHours(Timedef);
@@ -95,15 +90,10 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.myviewholder> 
                                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                                     if(snapshot.exists()){
                                         for(DataSnapshot dataSnapshot : snapshot.getChildren()){
-                                            if(dataSnapshot.hasChild("postId")){
-                                                if(dataSnapshot.child("postId").getValue(String.class).equals(model.getPostId())){
+                                            if(dataSnapshot.hasChild("postId") && model.getPostId() != null  && dataSnapshot.getKey() != null){
+                                                if(Objects.equals(dataSnapshot.child("postId").getValue(String.class), model.getPostId())){
                                                     reference.child(dataSnapshot.getKey())
-                                                            .removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                        @Override
-                                                        public void onSuccess(Void unused) {
-                                                            Toast.makeText(context, "Value removed", Toast.LENGTH_LONG).show();
-                                                        }
-                                                    });
+                                                            .removeValue().addOnSuccessListener(unused13 -> Toast.makeText(context, "Value removed", Toast.LENGTH_LONG).show());
                                                 }
                                                 else{
                                                     Toast.makeText(context, dataSnapshot.child("postId").getValue(String.class) + " + " + model.getPostId() , Toast.LENGTH_LONG).show();
@@ -134,8 +124,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.myviewholder> 
                 .placeholder(R.drawable.ic_image)
                 .into(holder.binding.postImage);
 
-        holder.binding.like.setText(model.getPostLike() + "");
-        holder.binding.comment.setText(model.getCommentCount() + "");
+        holder.binding.like.setText(String.valueOf(model.getPostLike()));
+        holder.binding.comment.setText(String.valueOf(model.getCommentCount()));
         String description = model.getPostDescription();
         if (description.equals("")) {
             holder.binding.postDescription.setVisibility(View.GONE);
@@ -154,32 +144,35 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.myviewholder> 
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 UserClass user = snapshot.getValue(UserClass.class);
 
-                Picasso.get()
-                        .load(user.getProfile_image())
-                        .placeholder(R.drawable.ic_image)
-                        .into(holder.binding.postProfileImage);
-
-                holder.binding.userName.setText(user.getName());
-                holder.binding.profession.setText(user.getProfession());
-
-                holder.binding.postProfileImage.setOnClickListener(v -> {
-                    view = LayoutInflater.from(context).inflate(R.layout.sample_view_user_data, viewGroup, false);
-                    viewGroup.removeView(view);
-                    SampleViewUserDataBinding bd = SampleViewUserDataBinding.bind(view);
-                    bd.name.setText(user.getName());
-                    bd.profession.setText(user.getProfession());
+                if(user != null){
                     Picasso.get()
                             .load(user.getProfile_image())
-                            .placeholder(R.drawable.ic_user)
-                            .into(bd.profileImage);
+                            .placeholder(R.drawable.ic_image)
+                            .into(holder.binding.postProfileImage);
 
-                    AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-                    builder.setTitle("User Details");
-                    builder.setView(bd.getRoot());
-                    builder.setCancelable(true);
-                    builder.create();
-                    builder.show();
-                });
+                    holder.binding.userName.setText(user.getName());
+                    holder.binding.profession.setText(user.getProfession());
+
+                    holder.binding.postProfileImage.setOnClickListener(v -> {
+                        view = LayoutInflater.from(context).inflate(R.layout.sample_view_user_data, viewGroup, false);
+                        viewGroup.removeView(view);
+                        SampleViewUserDataBinding bd = SampleViewUserDataBinding.bind(view);
+                        bd.name.setText(user.getName());
+                        bd.profession.setText(user.getProfession());
+                        Picasso.get()
+                                .load(user.getProfile_image())
+                                .placeholder(R.drawable.ic_user)
+                                .into(bd.profileImage);
+
+                        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+                        builder.setTitle("User Details");
+                        builder.setView(bd.getRoot());
+                        builder.setCancelable(true);
+                        builder.create();
+                        builder.show();
+                    });
+                }
+
             }
 
             @Override
@@ -193,7 +186,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.myviewholder> 
                 .child("posts")
                 .child(model.getPostId())
                 .child("likes")
-                .child(FirebaseAuth.getInstance().getUid())
+                .child(Objects.requireNonNull(FirebaseAuth.getInstance().getUid()))
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -261,7 +254,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.myviewholder> 
         return list.size();
     }
 
-    class myviewholder extends RecyclerView.ViewHolder {
+    static class myviewholder extends RecyclerView.ViewHolder {
 
         SamplePostBinding binding;
 

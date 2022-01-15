@@ -43,6 +43,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class ChatActivity extends AppCompatActivity {
 
@@ -58,6 +59,7 @@ public class ChatActivity extends AppCompatActivity {
 
     ProgressDialog dialog;
     String senderUid, receiverUid, name, profile, token;
+    String messageTxt, randromKey;
     SpeechRecognizer speechRecognizer;
     int count = 0;
 
@@ -77,7 +79,6 @@ public class ChatActivity extends AppCompatActivity {
         dialog.setCancelable(false);
 
         messages = new ArrayList<>();
-
 
         name = getIntent().getStringExtra("name");
         profile = getIntent().getStringExtra("image");
@@ -188,31 +189,125 @@ public class ChatActivity extends AppCompatActivity {
                 binding.messageBox.setText(data.get(0));
 
                 String messageTxt = data.get(0);
-
                 Date date = new Date();
                 Message message = new Message(messageTxt, senderUid, date.getTime());
+                database.getReference().child("chats").child(senderRoom)
+                        .child("Status")
+                        .addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                if(snapshot.exists()){
+                                    String status = snapshot.getValue(String.class);
+                                    if(status != null && status.equals("Accept")){
+                                        randromKey = FirebaseDatabase.getInstance().getReference().push().getKey();
+                                        binding.messageBox.setText("");
 
+                                        HashMap<String, Object> lastMsgObj = new HashMap<>();
+                                        lastMsgObj.put("lastMsg", message.getMessage());
+                                        lastMsgObj.put("lastMsgTime", date.getTime());
 
-                HashMap<String, Object> lastMsgObj = new HashMap<>();
-                lastMsgObj.put("lastMsg", message.getMessage());
-                lastMsgObj.put("lastMsgTime", date.getTime());
+                                        database.getReference().child("chats").child(senderRoom).updateChildren(lastMsgObj);
+                                        database.getReference().child("chats").child(receiverRoom).updateChildren(lastMsgObj);
 
-                database.getReference().child("chats").child(senderRoom).updateChildren(lastMsgObj);
-                database.getReference().child("chats").child(receiverRoom).updateChildren(lastMsgObj);
+                                        database.getReference().child("chats")
+                                                .child(senderRoom)
+                                                .child("messages")
+                                                .child(randromKey)
+                                                .setValue(message).addOnSuccessListener(aVoid -> database.getReference().child("chats")
+                                                .child(receiverRoom)
+                                                .child("messages")
+                                                .child(randromKey)
+                                                .setValue(message).addOnSuccessListener(aVoid1 -> {
+                                                    if(message.getMessage() != null && message.getMessage().equals("")){
+                                                        sendNotification(name, message.getMessage(), token);
+                                                    }
+                                                }));
+                                    }
+                                    else{
+                                        randromKey = FirebaseDatabase.getInstance().getReference().push().getKey();
+                                        binding.messageBox.setText("");
 
-                database.getReference().child("chats")
-                        .child(senderRoom)
-                        .child("messages")
-                        .push()
-                        .setValue(message).addOnSuccessListener(aVoid -> database.getReference().child("chats")
-                        .child(receiverRoom)
-                        .push()
-                        .setValue(message).addOnSuccessListener(aVoid1 -> {
-                            binding.messageBox.setText("");
-                            binding.sendBtn.setVisibility(View.GONE);
-                            binding.micbtn.setVisibility(View.VISIBLE);
-                            sendNotification(name, message.getMessage(), token);
-                        }));
+                                        HashMap<String, Object> lastMsgObj = new HashMap<>();
+                                        lastMsgObj.put("lastMsg", message.getMessage());
+                                        lastMsgObj.put("lastMsgTime", date.getTime());
+
+                                        database.getReference().child("chats").child(senderRoom).updateChildren(lastMsgObj);
+                                        database.getReference().child("chats").child(receiverRoom).updateChildren(lastMsgObj);
+
+                                        database.getReference().child("chats")
+                                                .child(senderRoom)
+                                                .child("messages")
+                                                .child(randromKey)
+                                                .setValue(message).addOnSuccessListener(aVoid -> database.getReference().child("chats")
+                                                .child(receiverRoom)
+                                                .child("messages")
+                                                .child(randromKey)
+                                                .setValue(message).addOnSuccessListener(aVoid1 -> {
+                                                    if(message.getMessage() != null && message.getMessage().equals("")){
+                                                        sendNotification(name, message.getMessage(), token);
+                                                    }
+
+                                                    Request request = new Request();
+                                                    request.setRequestId(senderUid);
+                                                    request.setRequestAt(new Date().getTime());
+                                                    request.setRequestTo(receiverUid);
+
+                                                    database.getReference().child("Requests")
+                                                            .child(senderRoom)
+                                                            .setValue(request).addOnSuccessListener(unused -> {
+                                                        binding.sendBtn.setVisibility(View.GONE);
+                                                        binding.micbtn.setVisibility(View.VISIBLE);
+                                                        Toast.makeText(getApplicationContext(), "Request sent successfully",Toast.LENGTH_LONG).show();
+                                                    });
+                                                }));
+                                    }
+                                }
+                                else{
+                                    randromKey = FirebaseDatabase.getInstance().getReference().push().getKey();
+                                    Date date = new Date();
+                                    binding.messageBox.setText("");
+
+                                    HashMap<String, Object> lastMsgObj = new HashMap<>();
+                                    lastMsgObj.put("lastMsg", message.getMessage());
+                                    lastMsgObj.put("lastMsgTime", date.getTime());
+
+                                    database.getReference().child("chats").child(senderRoom).updateChildren(lastMsgObj);
+                                    database.getReference().child("chats").child(receiverRoom).updateChildren(lastMsgObj);
+
+                                    database.getReference().child("chats")
+                                            .child(senderRoom)
+                                            .child("messages")
+                                            .child(randromKey)
+                                            .setValue(message).addOnSuccessListener(aVoid -> database.getReference().child("chats")
+                                            .child(receiverRoom)
+                                            .child("messages")
+                                            .child(randromKey)
+                                            .setValue(message).addOnSuccessListener(aVoid1 -> {
+                                                if(message.getMessage() != null && message.getMessage().equals("")){
+                                                    sendNotification(name, message.getMessage(), token);
+                                                }
+
+                                                Request request = new Request();
+                                                request.setRequestId(senderUid);
+                                                request.setRequestAt(new Date().getTime());
+                                                request.setRequestTo(receiverUid);
+
+                                                database.getReference().child("Requests")
+                                                        .child(senderRoom)
+                                                        .setValue(request).addOnSuccessListener(unused -> {
+                                                    binding.sendBtn.setVisibility(View.GONE);
+                                                    binding.micbtn.setVisibility(View.VISIBLE);
+                                                    Toast.makeText(getApplicationContext(), "Request sent successfully",Toast.LENGTH_LONG).show();
+                                                });
+                                            }));
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
             }
 
             @Override
@@ -227,10 +322,14 @@ public class ChatActivity extends AppCompatActivity {
         });
 
         binding.sendBtn.setOnClickListener(v -> {
-            Toast.makeText(getApplicationContext(), "send button clicked", Toast.LENGTH_LONG).show();
+            messageTxt = binding.messageBox.getText().toString();
+            Date date = new Date();
+            Message message = new Message(messageTxt, senderUid, date.getTime());
+
             if(binding.messageBox.getText().toString().equals("") || binding.messageBox.getText().length() < 0){
                 Toast.makeText(getApplicationContext(), "Your message is Empty.", Toast.LENGTH_LONG).show();
             } else{
+                randromKey = FirebaseDatabase.getInstance().getReference().push().getKey();
                 database.getReference().child("chats").child(senderRoom)
                         .child("Status")
                         .addValueEventListener(new ValueEventListener() {
@@ -239,12 +338,8 @@ public class ChatActivity extends AppCompatActivity {
                                 if(snapshot.exists()){
                                     String status = snapshot.getValue(String.class);
                                     if(status != null && status.equals("Accept")){
-                                        String messageTxt = binding.messageBox.getText().toString();
 
-                                        Date date = new Date();
-                                        Message message = new Message(messageTxt, senderUid, date.getTime());
                                         binding.messageBox.setText("");
-
 
                                         HashMap<String, Object> lastMsgObj = new HashMap<>();
                                         lastMsgObj.put("lastMsg", message.getMessage());
@@ -256,19 +351,58 @@ public class ChatActivity extends AppCompatActivity {
                                         database.getReference().child("chats")
                                                 .child(senderRoom)
                                                 .child("messages")
-                                                .push()
+                                                .child(randromKey)
                                                 .setValue(message).addOnSuccessListener(aVoid -> database.getReference().child("chats")
-                                                        .child(receiverRoom)
-                                                        .child("messages")
-                                                        .push()
-                                                        .setValue(message).addOnSuccessListener(aVoid1 -> {
+                                                .child(receiverRoom)
+                                                .child("messages")
+                                                .child(randromKey)
+                                                .setValue(message).addOnSuccessListener(aVoid1 -> {
+                                                    if(message.getMessage() != null && message.getMessage().equals("")){
+                                                        sendNotification(name, message.getMessage(), token);
+                                                    }
                                                 }));
                                     }
-                                } else{
-                                    String messageTxt = binding.messageBox.getText().toString();
+                                    else{
+                                        binding.messageBox.setText("");
+
+                                        HashMap<String, Object> lastMsgObj = new HashMap<>();
+                                        lastMsgObj.put("lastMsg", message.getMessage());
+                                        lastMsgObj.put("lastMsgTime", date.getTime());
+
+                                        database.getReference().child("chats").child(senderRoom).updateChildren(lastMsgObj);
+                                        database.getReference().child("chats").child(receiverRoom).updateChildren(lastMsgObj);
+
+                                        database.getReference().child("chats")
+                                                .child(senderRoom)
+                                                .child("messages")
+                                                .child(randromKey)
+                                                .setValue(message).addOnSuccessListener(aVoid -> database.getReference().child("chats")
+                                                .child(receiverRoom)
+                                                .child("messages")
+                                                .child(randromKey)
+                                                .setValue(message).addOnSuccessListener(aVoid1 -> {
+                                                    if(message.getMessage() != null && message.getMessage().equals("")){
+                                                        sendNotification(name, message.getMessage(), token);
+                                                    }
+
+                                                    Request request = new Request();
+                                                    request.setRequestId(senderUid);
+                                                    request.setRequestAt(new Date().getTime());
+                                                    request.setRequestTo(receiverUid);
+
+                                                    database.getReference().child("Requests")
+                                                            .child(senderRoom)
+                                                            .setValue(request).addOnSuccessListener(unused -> {
+                                                        binding.sendBtn.setVisibility(View.GONE);
+                                                        binding.micbtn.setVisibility(View.VISIBLE);
+                                                        Toast.makeText(getApplicationContext(), "Request sent successfully",Toast.LENGTH_LONG).show();
+                                                    });
+                                                }));
+                                    }
+                                }
+                                else{
 
                                     Date date = new Date();
-                                    Message message = new Message(messageTxt, senderUid, date.getTime());
                                     binding.messageBox.setText("");
 
                                     HashMap<String, Object> lastMsgObj = new HashMap<>();
@@ -281,12 +415,15 @@ public class ChatActivity extends AppCompatActivity {
                                     database.getReference().child("chats")
                                             .child(senderRoom)
                                             .child("messages")
-                                            .push()
+                                            .child(randromKey)
                                             .setValue(message).addOnSuccessListener(aVoid -> database.getReference().child("chats")
-                                                    .child(receiverRoom)
-                                                    .child("messages")
-                                                    .push()
-                                                    .setValue(message).addOnSuccessListener(aVoid1 -> {
+                                            .child(receiverRoom)
+                                            .child("messages")
+                                            .child(randromKey)
+                                            .setValue(message).addOnSuccessListener(aVoid1 -> {
+                                                if(message.getMessage() != null && message.getMessage().equals("")){
+                                                    sendNotification(name, message.getMessage(), token);
+                                                }
 
                                                 Request request = new Request();
                                                 request.setRequestId(senderUid);
@@ -296,11 +433,10 @@ public class ChatActivity extends AppCompatActivity {
                                                 database.getReference().child("Requests")
                                                         .child(senderRoom)
                                                         .setValue(request).addOnSuccessListener(unused -> {
-                                                            binding.sendBtn.setVisibility(View.GONE);
-                                                            binding.micbtn.setVisibility(View.VISIBLE);
-                                                            sendNotification(name, message.getMessage(), token);
-                                                            Toast.makeText(getApplicationContext(), "Request sent successfully",Toast.LENGTH_LONG).show();
-                                                        });
+                                                    binding.sendBtn.setVisibility(View.GONE);
+                                                    binding.micbtn.setVisibility(View.VISIBLE);
+                                                    Toast.makeText(getApplicationContext(), "Request sent successfully",Toast.LENGTH_LONG).show();
+                                                });
                                             }));
                                 }
                             }
@@ -355,7 +491,7 @@ public class ChatActivity extends AppCompatActivity {
         });
 
 
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(false);
 
     }
 
@@ -401,6 +537,7 @@ public class ChatActivity extends AppCompatActivity {
         if (requestCode == 25) {
             if (data != null) {
                 if (data.getData() != null) {
+                    randromKey = FirebaseDatabase.getInstance().getReference().push().getKey();
                     Uri selectedImage = data.getData();
                     Calendar calendar = Calendar.getInstance();
                     StorageReference reference = storage.getReference().child("chats").child(calendar.getTimeInMillis() + "");
@@ -429,11 +566,11 @@ public class ChatActivity extends AppCompatActivity {
                                 database.getReference().child("chats")
                                         .child(senderRoom)
                                         .child("messages")
-                                        .push()
+                                        .child(randromKey)
                                         .setValue(message).addOnSuccessListener(aVoid -> database.getReference().child("chats")
                                                 .child(receiverRoom)
                                                 .child("messages")
-                                                .push()
+                                                .child(randromKey)
                                                 .setValue(message).addOnSuccessListener(aVoid1 -> {
 
                                                 }));
@@ -448,6 +585,7 @@ public class ChatActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+
         FirebaseDatabase.getInstance().getReference().child("chats").child(senderRoom)
                 .child("Status")
                 .addValueEventListener(new ValueEventListener() {
@@ -455,7 +593,6 @@ public class ChatActivity extends AppCompatActivity {
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if(snapshot.exists()){
                             String status = snapshot.getValue(String.class);
-                            Toast.makeText(getApplicationContext(), "Status = "+status, Toast.LENGTH_LONG).show();
                             if(status != null && status.equals("Accept")){
                                 database.getReference().child("chats")
                                         .child(senderRoom)
@@ -466,8 +603,10 @@ public class ChatActivity extends AppCompatActivity {
                                                 messages.clear();
                                                 for (DataSnapshot snapshot1 : snapshot.getChildren()) {
                                                     Message message = snapshot1.getValue(Message.class);
-                                                    message.setMessageId(snapshot1.getKey());
-                                                    messages.add(message);
+                                                    if(message != null){
+                                                        message.setMessageId(snapshot1.getKey());
+                                                        messages.add(message);
+                                                    }
                                                 }
 
                                                 adapter.notifyDataSetChanged();
@@ -480,27 +619,7 @@ public class ChatActivity extends AppCompatActivity {
                                         });
                             }
                         } else{
-                            database.getReference().child("chats")
-                                    .child(senderRoom)
-                                    .child("messages")
-                                    .addValueEventListener(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                            messages.clear();
-                                            for (DataSnapshot snapshot1 : snapshot.getChildren()) {
-                                                Message message = snapshot1.getValue(Message.class);
-                                                message.setMessageId(snapshot1.getKey());
-                                                messages.add(message);
-                                            }
-
-                                            adapter.notifyDataSetChanged();
-                                        }
-
-                                        @Override
-                                        public void onCancelled(@NonNull DatabaseError error) {
-
-                                        }
-                                    });
+                            Toast.makeText(getApplicationContext(), "User is not in your Friend List.", Toast.LENGTH_LONG).show();
                         }
                     }
 
@@ -509,6 +628,11 @@ public class ChatActivity extends AppCompatActivity {
 
                     }
                 });
+
+        String currentId = FirebaseAuth.getInstance().getUid();
+        if (currentId != null) {
+            database.getReference().child("presence").child(currentId).setValue("Online");
+        }
     }
 
     @Override

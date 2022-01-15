@@ -3,24 +3,19 @@ package com.myinnovation.socom.Adapter;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 import com.myinnovation.socom.Model.Story;
 import com.myinnovation.socom.Model.UserClass;
 import com.myinnovation.socom.Model.UserStories;
@@ -30,7 +25,6 @@ import com.myinnovation.socom.databinding.SampleViewUserDataBinding;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
 
 import omari.hamza.storyview.StoryView;
 import omari.hamza.storyview.callback.StoryClickListeners;
@@ -163,7 +157,7 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.myviewholder
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     if (snapshot.exists()) {
                         String status = snapshot.getValue(String.class);
-                        if (!status.isEmpty()) {
+                        if (status != null && !status.isEmpty()) {
                             if (status.equals("Offline")) {
                                 holder.binding.live.setVisibility(View.GONE);
                             } else {
@@ -186,30 +180,34 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.myviewholder
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     UserClass user = snapshot.getValue(UserClass.class);
-                    Picasso.get()
-                            .load(user.getProfile_image())
-                            .placeholder(R.drawable.ic_user)
-                            .into(holder.binding.profileImage);
-                    holder.binding.name.setText(user.getName());
 
-                    holder.binding.profileImage.setOnClickListener(v -> {
-                        view = LayoutInflater.from(context).inflate(R.layout.sample_view_user_data, viewGroup, false);
-                        viewGroup.removeView(view);
-                        SampleViewUserDataBinding bd = SampleViewUserDataBinding.bind(view);
-                        bd.name.setText(user.getName());
-                        bd.profession.setText(user.getProfession());
+                    if(user != null){
                         Picasso.get()
                                 .load(user.getProfile_image())
                                 .placeholder(R.drawable.ic_user)
-                                .into(bd.profileImage);
+                                .into(holder.binding.profileImage);
+                        holder.binding.name.setText(user.getName());
 
-                        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-                        builder.setTitle("User Details");
-                        builder.setView(bd.getRoot());
-                        builder.setCancelable(true);
-                        builder.create();
-                        builder.show();
-                    });
+                        holder.binding.profileImage.setOnClickListener(v -> {
+                            view = LayoutInflater.from(context).inflate(R.layout.sample_view_user_data, viewGroup, false);
+                            viewGroup.removeView(view);
+                            SampleViewUserDataBinding bd = SampleViewUserDataBinding.bind(view);
+                            bd.name.setText(user.getName());
+                            bd.profession.setText(user.getProfession());
+                            Picasso.get()
+                                    .load(user.getProfile_image())
+                                    .placeholder(R.drawable.ic_user)
+                                    .into(bd.profileImage);
+
+                            AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+                            builder.setTitle("User Details");
+                            builder.setView(bd.getRoot());
+                            builder.setCancelable(true);
+                            builder.create();
+                            builder.show();
+                        });
+                    }
+
 
                     holder.binding.story.setOnClickListener(v -> {
                         ArrayList<MyStory> myStories = new ArrayList<>();
@@ -220,25 +218,27 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.myviewholder
                             ));
                         }
 
-                        new StoryView.Builder(((AppCompatActivity) context).getSupportFragmentManager())
-                                .setStoriesList(myStories) // Required
-                                .setStoryDuration(5000) // Default is 2000 Millis (2 Seconds)
-                                .setTitleText(user.getName()) // Default is Hidden
-                                .setSubtitleText("") // Default is Hidden
-                                .setTitleLogoUrl(user.getProfile_image()) // Default is Hidden
-                                .setStoryClickListeners(new StoryClickListeners() {
-                                    @Override
-                                    public void onDescriptionClickListener(int position1) {
-                                        //your action
-                                    }
+                        if (user != null) {
+                            new StoryView.Builder(((AppCompatActivity) context).getSupportFragmentManager())
+                                    .setStoriesList(myStories) // Required
+                                    .setStoryDuration(5000) // Default is 2000 Millis (2 Seconds)
+                                    .setTitleText(user.getName()) // Default is Hidden
+                                    .setSubtitleText("") // Default is Hidden
+                                    .setTitleLogoUrl(user.getProfile_image()) // Default is Hidden
+                                    .setStoryClickListeners(new StoryClickListeners() {
+                                        @Override
+                                        public void onDescriptionClickListener(int position1) {
+                                            //your action
+                                        }
 
-                                    @Override
-                                    public void onTitleIconClickListener(int position1) {
-                                        //your action
-                                    }
-                                }) // Optional Listeners
-                                .build() // Must be called before calling show method
-                                .show();
+                                        @Override
+                                        public void onTitleIconClickListener(int position1) {
+                                            //your action
+                                        }
+                                    }) // Optional Listeners
+                                    .build() // Must be called before calling show method
+                                    .show();
+                        }
                     });
                 }
 
@@ -256,7 +256,7 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.myviewholder
         return list.size();
     }
 
-    class myviewholder extends RecyclerView.ViewHolder {
+    static class myviewholder extends RecyclerView.ViewHolder {
 
         SampleStoryBinding binding;
 

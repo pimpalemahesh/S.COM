@@ -15,7 +15,6 @@ import androidx.core.app.NotificationCompat;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.myinnovation.socom.Activity.AllUsersChatActivity;
-import com.myinnovation.socom.Activity.MainActivity;
 import com.myinnovation.socom.R;
 
 import org.jetbrains.annotations.NotNull;
@@ -27,7 +26,9 @@ public class MyFirstbaseService extends FirebaseMessagingService {
 
 
         RemoteMessage.Notification notification = remoteMessage.getNotification();
-        sendNotification(notification.getTitle(), notification.getBody());
+        if (notification != null) {
+            sendNotification(notification.getTitle(), notification.getBody());
+        }
 
     }
 

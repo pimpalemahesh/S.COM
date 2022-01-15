@@ -47,6 +47,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:scaleType="centerCrop"
+                        android:contentDescription="@string/cover_photo"
                         android:src="@drawable/ic_image" />
 
                     <View
@@ -78,6 +79,7 @@
                 android:layout_marginBottom="16dp"
                 android:src="@drawable/ic_image"
                 android:background="@color/black"
+                android:contentDescription="@string/ic_change_cover_photo_icon_image"
                 app:layout_constraintBottom_toBottomOf="@+id/linearLayout"
                 app:layout_constraintEnd_toStartOf="@+id/profileImage"
                 app:layout_constraintHorizontal_bias="0.314"
@@ -89,6 +91,7 @@
                 android:layout_height="wrap_content"
                 android:visibility="gone"
                 android:src="@drawable/ic_checked"
+                android:contentDescription="@string/verify_account_image"
                 app:layout_constraintBottom_toBottomOf="@+id/profileImage"
                 app:layout_constraintEnd_toEndOf="@+id/profileImage"
                 app:layout_constraintHorizontal_bias="0.9"
@@ -160,6 +163,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_addfriend"
+                android:contentDescription="@string/add_friend_image"
                 app:layout_constraintBottom_toBottomOf="@+id/addFriendView"
                 app:layout_constraintEnd_toEndOf="@+id/addFriendView"
                 app:layout_constraintHorizontal_bias="0.41"
@@ -171,6 +175,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_comment"
+                android:contentDescription="@string/comment_image"
                 app:layout_constraintBottom_toBottomOf="@+id/commentView"
                 app:layout_constraintEnd_toEndOf="@+id/commentView"
                 app:layout_constraintHorizontal_bias="0.48"
@@ -183,6 +188,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_call"
+                android:contentDescription="@string/call_image"
                 app:layout_constraintBottom_toBottomOf="@+id/callView"
                 app:layout_constraintEnd_toEndOf="@+id/callView"
                 app:layout_constraintHorizontal_bias="0.52"

@@ -7,7 +7,6 @@ import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -56,29 +55,30 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         UserClass user = snapshot.getValue(UserClass.class);
-
-
-
-
                         String text = TimeAgo.using(notification.getNotificationAt());
-                        Picasso.get()
-                                .load(user.getProfile_image())
-                                .placeholder(R.drawable.ic_user)
-                                .into(holder.binding.profileImage);
+                        if (user != null) {
+                            Picasso.get()
+                                    .load(user.getProfile_image())
+                                    .placeholder(R.drawable.ic_user)
+                                    .into(holder.binding.profileImage);
 
-                        holder.binding.time.setText(text);
 
-                        if(type.equals("like")){
-                            holder.binding.notification.setText(Html.fromHtml("<b>" + user.getName() + "</b>" + " liked your post"));
-                        }
-                        else if(type.equals("comment")){
-                            holder.binding.notification.setText(Html.fromHtml("<b>" + user.getName() + "</b>" + " Commented on your post"));
-                        }
-                        else if(type.equals("follow")){
-                            holder.binding.notification.setText(Html.fromHtml("<b>" + user.getName() + "</b>" + " start following you"));
-                        }
-                        else{
-                            holder.binding.notification.setText("You have notification");
+                            holder.binding.time.setText(text);
+
+                            switch (type) {
+                                case "like":
+                                    holder.binding.notification.setText(Html.fromHtml("<b>" + user.getName() + "</b>" + " liked your post"));
+                                    break;
+                                case "comment":
+                                    holder.binding.notification.setText(Html.fromHtml("<b>" + user.getName() + "</b>" + " Commented on your post"));
+                                    break;
+                                case "follow":
+                                    holder.binding.notification.setText(Html.fromHtml("<b>" + user.getName() + "</b>" + " start following you"));
+                                    break;
+                                default:
+                                    holder.binding.notification.setText(R.string.you_have_notification);
+                                    break;
+                            }
                         }
                     }
 
@@ -88,35 +88,29 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                     }
                 });
 
-        holder.binding.openNotification.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        holder.binding.openNotification.setOnClickListener(v -> {
 
-                if(!type.equals("follow")){
-                    FirebaseDatabase.getInstance().getReference()
-                            .child("notification")
-                            .child(notification.getPostedBy())
-                            .child(notification.getNotificationId())
-                            .child("checkOpen")
-                            .setValue(true);
+            if (!type.equals("follow")) {
+                FirebaseDatabase.getInstance().getReference()
+                        .child("notification")
+                        .child(notification.getPostedBy())
+                        .child(notification.getNotificationId())
+                        .child("checkOpen")
+                        .setValue(true);
 
-                    Intent intent = new Intent(context, CommentActivity.class);
-                    intent.putExtra("postId", notification.getPostId());
-                    intent.putExtra("postedBy", notification.getPostedBy());
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    context.startActivity(intent);
-                } else {
-
-                }
-
+                Intent intent = new Intent(context, CommentActivity.class);
+                intent.putExtra("postId", notification.getPostId());
+                intent.putExtra("postedBy", notification.getPostedBy());
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                context.startActivity(intent);
             }
+
         });
 
         Boolean checkOpen = notification.isCheckOpen();
-        if(checkOpen.equals(true)){
+        if (checkOpen.equals(true)) {
             holder.binding.openNotification.setBackgroundColor(Color.parseColor("#FFFFFF"));
         }
-        else{}
     }
 
     @Override
@@ -124,7 +118,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         return list.size();
     }
 
-    class myviewholder extends RecyclerView.ViewHolder {
+    static class myviewholder extends RecyclerView.ViewHolder {
 
         SampleNotificationBinding binding;
 

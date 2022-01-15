@@ -1,7 +1,7 @@
 package com.myinnovation.socom.fragments;
 
 import android.app.ProgressDialog;
-import android.app.appsearch.AppSearchResult;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -43,6 +43,7 @@ public class AddPostFragment extends Fragment {
     FirebaseAuth mAuth;
     FirebaseDatabase mbase;
     FirebaseStorage storage;
+    Context context;
 
     public AddPostFragment() {
         // Required empty public constructor
@@ -56,36 +57,41 @@ public class AddPostFragment extends Fragment {
         mAuth = FirebaseAuth.getInstance();
         mbase = FirebaseDatabase.getInstance();
         storage = FirebaseStorage.getInstance();
+        if(getContext() != null){
+            context = getContext();
+        }
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         binding = FragmentAddPostBinding.inflate(inflater, container, false);
 
         ProgressDialog progressDialog = new ProgressDialog(getContext());
         progressDialog.setTitle("Post Uploading");
-        progressDialog.setProgressStyle(progressDialog.STYLE_SPINNER);
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         progressDialog.setMessage("Uploaded : ");
         progressDialog.setCancelable(false);
         progressDialog.setCanceledOnTouchOutside(false);
 
         mbase.getReference().child("Users")
-                .child(FirebaseAuth.getInstance().getUid())
+                .child(Objects.requireNonNull(FirebaseAuth.getInstance().getUid()))
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if (snapshot.exists()) {
                             UserClass user = snapshot.getValue(UserClass.class);
 
-                            Picasso.get()
-                                    .load(user.getProfile_image())
-                                    .placeholder(R.drawable.ic_image)
-                                    .into(binding.postProfileImage);
+                            if (user != null) {
+                                Picasso.get()
+                                        .load(user.getProfile_image())
+                                        .placeholder(R.drawable.ic_image)
+                                        .into(binding.postProfileImage);
 
-                            binding.name.setText(user.getName());
-                            binding.profession.setText(user.getProfession());
+                                binding.name.setText(user.getName());
+                                binding.profession.setText(user.getProfession());
+                            }
                         }
                     }
 
@@ -105,12 +111,12 @@ public class AddPostFragment extends Fragment {
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 String description = binding.postDescription.getText().toString();
                 if (!description.isEmpty()) {
-                    binding.postBtn.setBackgroundDrawable(ContextCompat.getDrawable(getContext(), R.drawable.follow_btn));
-                    binding.postBtn.setTextColor(getContext().getResources().getColor(R.color.white));
+                    binding.postBtn.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.follow_btn));
+                    binding.postBtn.setTextColor(context.getResources().getColor(R.color.white));
                     binding.postBtn.setEnabled(true);
                 } else {
-                    binding.postBtn.setBackgroundDrawable(ContextCompat.getDrawable(getContext(), R.drawable.follow_active_btn));
-                    binding.postBtn.setTextColor(getContext().getResources().getColor(R.color.white));
+                    binding.postBtn.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.follow_active_btn));
+                    binding.postBtn.setTextColor(context.getResources().getColor(R.color.white));
                     binding.postBtn.setEnabled(false);
                 }
             }
@@ -160,7 +166,7 @@ public class AddPostFragment extends Fragment {
                                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                                             if(snapshot.exists()){
                                                 for(DataSnapshot dataSnapshot : snapshot.getChildren()){
-                                                    if(dataSnapshot.getKey().equals(post.getPostBy())){
+                                                    if(Objects.equals(dataSnapshot.getKey(), post.getPostBy())){
                                                         FirebaseDatabase.getInstance().getReference()
                                                                 .child("Users")
                                                                 .child(post.getPostBy())
@@ -200,12 +206,12 @@ public class AddPostFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == 103  &&  data.getData() != null) {
+        if (data != null && requestCode == 103 && data.getData() != null) {
             uri = data.getData();
             binding.postImage.setImageURI(uri);
             binding.postImage.setVisibility(View.VISIBLE);
-            binding.postBtn.setBackgroundDrawable(ContextCompat.getDrawable(getContext(), R.drawable.follow_btn));
-            binding.postBtn.setTextColor(getContext().getResources().getColor(R.color.white));
+            binding.postBtn.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.follow_btn));
+            binding.postBtn.setTextColor(context.getResources().getColor(R.color.white));
             binding.postBtn.setEnabled(true);
         }
     }

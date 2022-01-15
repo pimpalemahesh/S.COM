@@ -3,7 +3,6 @@ package com.myinnovation.socom.Adapter;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +12,6 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -30,6 +28,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Objects;
 
 public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.myviewholder> {
 
@@ -38,6 +37,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.myviewhold
     Activity activity;
     View view;
     ViewGroup viewGroup;
+    DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
 
     public SearchAdapter(ArrayList<UserClass> list, Context context, Activity activity) {
         this.list = list;
@@ -85,16 +85,17 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.myviewhold
         });
 
         // checking follwers if exist already.
-        FirebaseDatabase.getInstance().getReference()
+        reference
                 .child("Users")
                 .child(user.getUserId())
                 .child("followers")
-                .child(FirebaseAuth.getInstance().getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                .child(Objects.requireNonNull(FirebaseAuth.getInstance().getUid()))
+                .addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
                     holder.binding.followBtn.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.follow_active_btn));
-                    holder.binding.followBtn.setText("Following");
+                    holder.binding.followBtn.setText(R.string.following);
                     holder.binding.followBtn.setTextColor(context.getResources().getColor(R.color.grey));
                     holder.binding.followBtn.setEnabled(false);
                 } else {
@@ -104,66 +105,64 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.myviewhold
                         follow.setFollowedBy(FirebaseAuth.getInstance().getUid());
                         follow.setFollowedAt(new Date().getTime());
 
-                        FirebaseDatabase.getInstance().getReference()
+                        reference
                                 .child("Users")
                                 .child(user.getUserId())
                                 .child("followers")
                                 .child(FirebaseAuth.getInstance().getUid())
                                 .setValue(follow)
-                                .addOnSuccessListener(unused -> {
-                                    FirebaseDatabase.getInstance().getReference()
-                                            .child("Users")
-                                            .child(user.getUserId())
-                                            .child("followerCount")
-                                            .setValue(user.getFollowerCount() + 1).addOnSuccessListener(unused1 -> {
+                                .addOnSuccessListener(unused -> reference
+                                        .child("Users")
+                                        .child(user.getUserId())
+                                        .child("followerCount")
+                                        .setValue(user.getFollowerCount() + 1).addOnSuccessListener(unused1 -> {
 
 
-                                                DatabaseReference reference = FirebaseDatabase.getInstance().getReference()
-                                                        .child("Users");
-                                                reference.addListenerForSingleValueEvent(new ValueEventListener() {
-                                                    @Override
-                                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                                        if(snapshot.exists()){
-                                                            for(DataSnapshot dataSnapshot : snapshot.getChildren()){
-                                                                if(dataSnapshot.getKey().equals(follow.getFollowedBy())){
-                                                                    FirebaseDatabase.getInstance().getReference()
-                                                                            .child("Users")
-                                                                            .child(follow.getFollowedBy())
-                                                                            .child("friendCount")
-                                                                            .setValue(dataSnapshot.child("friendCount").getValue(Long.class) + 1);
-                                                                    break;
-                                                                }
+                                            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference()
+                                                    .child("Users");
+                                            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                    if(snapshot.exists()){
+                                                        for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                                                            if(Objects.equals(dataSnapshot.getKey(), follow.getFollowedBy())){
+                                                                reference
+                                                                        .child("Users")
+                                                                        .child(follow.getFollowedBy())
+                                                                        .child("friendCount")
+                                                                        .setValue(dataSnapshot.child("friendCount").getValue(Long.class) + 1);
+                                                                break;
                                                             }
                                                         }
-
                                                     }
 
-                                                    @Override
-                                                    public void onCancelled(@NonNull DatabaseError error) {
+                                                }
 
-                                                    }
-                                                });
+                                                @Override
+                                                public void onCancelled(@NonNull DatabaseError error) {
 
-                                        holder.binding.followBtn.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.follow_active_btn));
-                                        holder.binding.followBtn.setText("Following");
-                                        holder.binding.followBtn.setTextColor(context.getResources().getColor(R.color.grey));
-                                        holder.binding.followBtn.setEnabled(false);
-                                        Toast.makeText(context, "You Followed " + user.getName(), Toast.LENGTH_LONG).show();
+                                                }
+                                            });
+
+                                    holder.binding.followBtn.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.follow_active_btn));
+                                    holder.binding.followBtn.setText(R.string.following);
+                                    holder.binding.followBtn.setTextColor(context.getResources().getColor(R.color.grey));
+                                    holder.binding.followBtn.setEnabled(false);
+                                    Toast.makeText(context, "You Followed " + user.getName(), Toast.LENGTH_LONG).show();
 
 
 
-                                        Notification notification = new Notification();
-                                        notification.setNotificationBy(FirebaseAuth.getInstance().getUid());
-                                        notification.setNotificationAt(new Date().getTime());
-                                        notification.setType("follow");
+                                    Notification notification = new Notification();
+                                    notification.setNotificationBy(FirebaseAuth.getInstance().getUid());
+                                    notification.setNotificationAt(new Date().getTime());
+                                    notification.setType("follow");
 
-                                        FirebaseDatabase.getInstance().getReference()
-                                                .child("notification")
-                                                .child(user.getUserId())
-                                                .push()
-                                                .setValue(notification);
-                                    });
-                                });
+                                    reference
+                                            .child("notification")
+                                            .child(user.getUserId())
+                                            .push()
+                                            .setValue(notification);
+                                }));
                     });
                 }
             }
@@ -182,7 +181,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.myviewhold
         return list.size();
     }
 
-    class myviewholder extends RecyclerView.ViewHolder {
+    static class myviewholder extends RecyclerView.ViewHolder {
 
         SampleUserBinding binding;
 

@@ -1,21 +1,14 @@
 package com.myinnovation.socom.Activity;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.SearchView;
 
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -24,13 +17,11 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.myinnovation.socom.Adapter.ChatUsersAdapter;
 import com.myinnovation.socom.Model.UserClass;
-import com.myinnovation.socom.R;
 import com.myinnovation.socom.databinding.ActivityAllUsersChatBinding;
-import com.myinnovation.socom.fragments.ChatsFragment;
-import com.myinnovation.socom.fragments.HomeFragment;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 
 public class AllUsersChatActivity extends AppCompatActivity {
 
@@ -40,7 +31,7 @@ public class AllUsersChatActivity extends AppCompatActivity {
     ArrayList<UserClass> list = new ArrayList<>();
     FirebaseAuth mAuth;
     FirebaseDatabase mbase;
-
+    String currentId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,10 +41,13 @@ public class AllUsersChatActivity extends AppCompatActivity {
 
         setSupportActionBar(binding.toolbar3);
         AllUsersChatActivity.this.setTitle(getIntent().getStringExtra("username"));
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
 
         mAuth = FirebaseAuth.getInstance();
         mbase = FirebaseDatabase.getInstance();
+        if(mAuth.getUid() != null){
+            currentId = mAuth.getUid();
+        }
         binding.chatUserRv.showShimmerAdapter();
 
         adapter = new ChatUsersAdapter(list, AllUsersChatActivity.this);
@@ -61,7 +55,6 @@ public class AllUsersChatActivity extends AppCompatActivity {
         binding.chatUserRv.setLayoutManager(layoutManager);
 
 
-        if(binding.searchview != null){
             binding.searchview.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override
                 public boolean onQueryTextSubmit(String query) {
@@ -74,23 +67,18 @@ public class AllUsersChatActivity extends AppCompatActivity {
                     return true;
                 }
             });
-        }
 
 
 
         FirebaseMessaging.getInstance()
                 .getToken()
-                .addOnSuccessListener(new OnSuccessListener<String>() {
-                    @Override
-                    public void onSuccess(String token) {
-                        HashMap<String, Object> map = new HashMap<>();
-                        map.put("token", token);
-                        mbase.getReference()
-                                .child("Users")
-                                .child(FirebaseAuth.getInstance().getUid())
-                                .updateChildren(map);
-                        //Toast.makeText(MainActivity.this, token, Toast.LENGTH_SHORT).show();
-                    }
+                .addOnSuccessListener(token -> {
+                    HashMap<String, Object> map = new HashMap<>();
+                    map.put("token", token);
+                    mbase.getReference()
+                            .child("Users")
+                            .child(currentId)
+                            .updateChildren(map);
                 });
 
 
@@ -104,14 +92,16 @@ public class AllUsersChatActivity extends AppCompatActivity {
                         list.clear();
                         for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                             UserClass user = dataSnapshot.getValue(UserClass.class);
-                            user.setUserId(dataSnapshot.getKey());
-                            if (!dataSnapshot.getKey().equals(FirebaseAuth.getInstance().getUid())) {
-                                list.add(user);
+                            if(user != null && dataSnapshot.getKey() != null){
+                                user.setUserId(dataSnapshot.getKey());
+                                if (!dataSnapshot.getKey().equals(currentId)) {
+                                    list.add(user);
+                                }
+                                binding.chatUserRv.setAdapter(adapter);
+                                binding.chatUserRv.hideShimmerAdapter();
                             }
-                            binding.chatUserRv.setAdapter(adapter);
-                            binding.chatUserRv.hideShimmerAdapter();
-                            adapter.notifyDataSetChanged();
                         }
+                        adapter.notifyDataSetChanged();
                     }
 
                     @Override
@@ -138,20 +128,19 @@ public class AllUsersChatActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         finish();
+        startActivity(new Intent(this, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
         return super.onOptionsItemSelected(item);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        String currentId = FirebaseAuth.getInstance().getUid();
         mbase.getReference().child("presence").child(currentId).setValue("Online");
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        String currentId = FirebaseAuth.getInstance().getUid();
         mbase.getReference().child("presence").child(currentId).setValue("Offline");
     }
 }

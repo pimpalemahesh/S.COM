@@ -9,9 +9,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?selectableItemBackground"
-        android:gravity="right"
+        android:gravity="end"
         android:padding="10dp"
-        android:text="Delete for Everyone"
+        android:text="@string/delete_for_everyone"
         android:textColor="@color/black"
         android:textSize="16sp" />
 
@@ -20,9 +20,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?selectableItemBackground"
-        android:gravity="right"
+        android:gravity="end"
         android:padding="10dp"
-        android:text="Cancel"
+        android:text="@string/cancel"
         android:textColor="@color/black"
         android:textSize="16sp" />
 
@@ -31,9 +31,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?selectableItemBackground"
-        android:gravity="right"
+        android:gravity="end"
         android:padding="10dp"
-        android:text="Delete for Me"
+        android:text="@string/delete_for_me"
         android:textColor="@color/black"
         android:textSize="16sp" />
 </LinearLayout>

@@ -42,7 +42,8 @@
         app:layout_constraintEnd_toStartOf="@+id/commentPostBtn"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        tools:ignore="TouchTargetSizeCheck" />
+        tools:ignore="TouchTargetSizeCheck"
+        android:importantForAutofill="no" />
 
     <ImageView
         android:id="@+id/commentPostBtn"
@@ -50,6 +51,7 @@
         android:layout_height="36dp"
         android:layout_marginEnd="4dp"
         android:src="@drawable/ic_baseline_send_24"
+        android:contentDescription="@string/comment_post_button_image"
         app:layout_constraintBottom_toBottomOf="@+id/commentText"
         app:layout_constraintEnd_toEndOf="@+id/view12"
         app:layout_constraintTop_toTopOf="@+id/commentText" />
@@ -87,6 +89,7 @@
                 android:layout_width="0dp"
                 android:layout_height="170dp"
                 android:scaleType="centerCrop"
+                android:contentDescription="@string/post_image"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"

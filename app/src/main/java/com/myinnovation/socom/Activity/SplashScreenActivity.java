@@ -8,11 +8,8 @@ import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.WindowManager;
-import android.widget.ProgressBar;
 
 import com.myinnovation.socom.R;
-
-import java.net.InetAddress;
 
 public class SplashScreenActivity extends AppCompatActivity {
 
