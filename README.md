@@ -47,7 +47,4 @@ If you're interested in contributing to SocialConnect, feel free to fork the rep
 
 If you encounter any issues or have suggestions for improvement, please [create an issue](https://github.com/pimpalemahesh/SocialConnect/issues).
 
-
-## Acknowledgments
-
 Enjoy connecting socially! 🌐📱👥💬💖
