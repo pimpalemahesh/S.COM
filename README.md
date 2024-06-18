@@ -50,6 +50,4 @@ If you encounter any issues or have suggestions for improvement, please [create 
 
 ## Acknowledgments
 
-Special thanks to [pimpalemahesh](https://github.com/pimpalemahesh) for the excellent work and contribution to the project.
-
 Enjoy connecting socially! 🌐📱👥💬💖
